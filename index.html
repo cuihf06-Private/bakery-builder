@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🍞 面包工坊极速版</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #F5DEB3 0%, #DEB887 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* 顶部状态栏 */
+    .header {
+      background: #8B4513;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+    
+    .header-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .header-item span {
+      font-size: 24px;
+    }
+    
+    .timer {
+      background: #D2691E;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 20px;
+    }
+    
+    /* 主游戏区 */
+    #game {
+      display: flex;
+      height: calc(100vh - 60px);
+      padding: 10px;
+      gap: 10px;
+    }
+    
+    /* 四栏布局 */
+    .field, .kitchen, .market, .shop {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      overflow-y: auto;
+    }
+    
+    .field {
+      width: 25%;
+    }
+    
+    .kitchen {
+      width: 25%;
+    }
+    
+    .market {
+      width: 25%;
+    }
+    
+    .shop {
+      width: 25%;
+    }
+    
+    .section-title {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #8B4513;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #DEB887;
+    }
+    
+    /* 农田区 */
+    .seeds-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+      padding: 8px;
+      background: #FFF8DC;
+      border-radius: 10px;
+    }
+    
+    .seed-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 10px;
+      background: white;
+      border-radius: 20px;
+      border: 2px solid #DEB887;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 13px;
+    }
+    
+    .seed-item:hover {
+      transform: scale(1.05);
+      border-color: #8B4513;
+    }
+    
+    .seed-item.locked {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .seed-item.selected {
+      background: #F5DEB3;
+      border-color: #8B4513;
+      box-shadow: 0 0 8px rgba(139, 69, 19, 0.4);
+    }
+    
+    .seed-item .unlimited {
+      font-size: 10px;
+      color: #2E8B57;
+      font-weight: bold;
+    }
+    
+    .farm-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    
+    .farm-plot {
+      aspect-ratio: 1;
+      background: #D2691E;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 3px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .farm-plot:hover {
+      transform: scale(1.02);
+      border-color: #8B4513;
+    }
+    
+    .farm-plot.planted {
+      background: #8B4513;
+    }
+    
+    .farm-plot.ready {
+      animation: blink 1s infinite;
+      border-color: #FFD700;
+    }
+    
+    @keyframes blink {
+      0%, 100% { box-shadow: 0 0 10px #FFD700; }
+      50% { box-shadow: 0 0 25px #FFD700; }
+    }
+    
+    .crop-icon {
+      font-size: 32px;
+      margin-bottom: 3px;
+    }
+    
+    .progress-bar {
+      width: 80%;
+      height: 5px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: #90EE90;
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+    
+    .plot-status {
+      font-size: 10px;
+      color: white;
+      margin-top: 2px;
+    }
+    
+    /* 制作区 */
+    .inventory-box {
+      background: #FFF8DC;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 12px;
+      min-height: 70px;
+    }
+    
+    .inventory-title {
+      font-size: 13px;
+      color: #8B4513;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+    
+    .inventory-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    
+    .inv-item {
+      width: 42px;
+      height: 42px;
+      background: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border: 2px solid #DEB887;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .inv-item:hover {
+      transform: scale(1.1);
+      border-color: #8B4513;
+    }
+    
+    .inv-item.selected {
+      background: #F5DEB3;
+      border-color: #8B4513;
+      box-shadow: 0 0 8px rgba(139, 69, 19, 0.5);
+    }
+    
+    .inv-item .count {
+      position: absolute;
+      bottom: 1px;
+      right: 1px;
+      background: #8B4513;
+      color: white;
+      font-size: 9px;
+      padding: 1px 4px;
+      border-radius: 8px;
+    }
+    
+    .recipes-box {
+      background: #FFF8DC;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 12px;
+    }
+    
+    .recipe-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+      margin-bottom: 6px;
+      background: white;
+      border-radius: 8px;
+      border: 2px solid #DEB887;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 13px;
+    }
+    
+    .recipe-item:hover {
+      border-color: #8B4513;
+      transform: translateX(3px);
+    }
+    
+    .recipe-item.can-craft {
+      border-color: #90EE90;
+      background: #F0FFF0;
+    }
+    
+    .recipe-ingredients {
+      display: flex;
+      gap: 3px;
+    }
+    
+    .recipe-ing {
+      font-size: 16px;
+    }
+    
+    .recipe-arrow {
+      font-size: 16px;
+      color: #8B4513;
+    }
+    
+    .recipe-result {
+      font-size: 22px;
+      margin-left: auto;
+    }
+    
+    .recipe-time {
+      font-size: 10px;
+      color: #666;
+    }
+    
+    .crafting-queue {
+      background: #FFF8DC;
+      border-radius: 10px;
+      padding: 10px;
+    }
+    
+    .crafting-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px;
+      margin-bottom: 6px;
+      background: white;
+      border-radius: 8px;
+    }
+    
+    .crafting-progress {
+      flex: 1;
+      height: 6px;
+      background: #eee;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .crafting-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #F5DEB3, #8B4513);
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+    
+    /* 市场区 */
+    .market-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .market-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: white;
+      border-radius: 10px;
+      border: 2px solid #DEB887;
+      transition: all 0.3s;
+    }
+    
+    .market-item:hover {
+      border-color: #8B4513;
+      transform: translateX(3px);
+    }
+    
+    .market-item-icon {
+      font-size: 32px;
+      width: 45px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #F5DEB3;
+      border-radius: 8px;
+    }
+    
+    .market-item-info {
+      flex: 1;
+    }
+    
+    .market-item-name {
+      font-weight: bold;
+      color: #8B4513;
+      font-size: 14px;
+    }
+    
+    .market-item-desc {
+      font-size: 11px;
+      color: #666;
+    }
+    
+    .market-btn {
+      padding: 6px 12px;
+      background: #90EE90;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 12px;
+      color: #2E8B57;
+      transition: all 0.3s;
+    }
+    
+    .market-btn:hover {
+      background: #7FDD7F;
+      transform: scale(1.05);
+    }
+    
+    .market-btn:disabled {
+      background: #ccc;
+      color: #999;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* 售卖区 */
+    .counter-box {
+      background: #FFF8DC;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 12px;
+      min-height: 80px;
+    }
+    
+    .counter-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    
+    .counter-item {
+      width: 50px;
+      height: 50px;
+      background: white;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #DEB887;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .counter-item:hover {
+      transform: scale(1.05);
+      border-color: #8B4513;
+    }
+    
+    .counter-item.selected {
+      background: #F5DEB3;
+      border-color: #8B4513;
+      box-shadow: 0 0 10px rgba(139, 69, 19, 0.5);
+    }
+    
+    .counter-item .bread-icon {
+      font-size: 26px;
+    }
+    
+    .counter-item .bread-price {
+      font-size: 9px;
+      color: #8B4513;
+      font-weight: bold;
+    }
+    
+    .counter-item .count {
+      position: absolute;
+      top: 1px;
+      right: 1px;
+      background: #8B4513;
+      color: white;
+      font-size: 9px;
+      padding: 1px 4px;
+      border-radius: 8px;
+    }
+    
+    .customers-box {
+      background: #FFF8DC;
+      border-radius: 10px;
+      padding: 10px;
+    }
+    
+    .customer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      margin-bottom: 8px;
+      background: white;
+      border-radius: 10px;
+      border: 2px solid #DEB887;
+      animation: slideIn 0.5s ease;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .customer-avatar {
+      font-size: 32px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #F5DEB3;
+      border-radius: 50%;
+    }
+    
+    .customer-info {
+      flex: 1;
+    }
+    
+    .customer-name {
+      font-weight: bold;
+      color: #8B4513;
+      font-size: 12px;
+    }
+    
+    .customer-want {
+      font-size: 11px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    
+    .customer-want-emoji {
+      font-size: 18px;
+    }
+    
+    .customer-btn {
+      padding: 6px 12px;
+      background: #90EE90;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 12px;
+      color: #2E8B57;
+      transition: all 0.3s;
+    }
+    
+    .customer-btn:hover {
+      background: #7FDD7F;
+      transform: scale(1.05);
+    }
+    
+    .customer-btn:disabled {
+      background: #ccc;
+      color: #999;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* 弹窗 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+    
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      transform: scale(0.8);
+      transition: all 0.3s;
+    }
+    
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+    
+    .modal-title {
+      font-size: 24px;
+      color: #8B4513;
+      margin-bottom: 15px;
+    }
+    
+    .modal-content {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    
+    .modal-stats {
+      background: #FFF8DC;
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #DEB887;
+      font-size: 14px;
+    }
+    
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+    
+    .modal-btn {
+      padding: 12px 35px;
+      background: #8B4513;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .modal-btn:hover {
+      background: #A0522D;
+      transform: scale(1.05);
+    }
+    
+    /* 升级商店 */
+    .upgrade-shop {
+      margin-top: 15px;
+    }
+    
+    .upgrade-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+      background: #FFF8DC;
+      border-radius: 10px;
+      border: 2px solid #DEB887;
+    }
+    
+    .upgrade-icon {
+      font-size: 30px;
+    }
+    
+    .upgrade-info {
+      flex: 1;
+      text-align: left;
+    }
+    
+    .upgrade-name {
+      font-weight: bold;
+      color: #8B4513;
+      font-size: 14px;
+    }
+    
+    .upgrade-desc {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .upgrade-btn {
+      padding: 6px 15px;
+      background: #90EE90;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 12px;
+      transition: all 0.3s;
+    }
+    
+    .upgrade-btn:hover {
+      background: #7FDD7F;
+    }
+    
+    .upgrade-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    /* 提示信息 */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #8B4513;
+      color: white;
+      padding: 10px 25px;
+      border-radius: 25px;
+      font-size: 14px;
+      z-index: 1001;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+    
+    /* 选中提示 */
+    .selection-hint {
+      font-size: 11px;
+      color: #8B4513;
+      text-align: center;
+      margin-bottom: 8px;
+      padding: 4px;
+      background: rgba(245, 222, 179, 0.5);
+      border-radius: 5px;
+    }
+    
+    /* 水井 */
+    .well-box {
+      background: #E0F7FA;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 12px;
+      text-align: center;
+      border: 2px solid #4DD0E1;
+    }
+    
+    .well-title {
+      font-size: 13px;
+      color: #00838F;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    
+    .well-btn {
+      padding: 8px 20px;
+      background: #4DD0E1;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .well-btn:hover {
+      background: #26C6DA;
+      transform: scale(1.05);
+    }
+    
+    .well-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .well-progress {
+      width: 100%;
+      height: 6px;
+      background: #B2EBF2;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    
+    .well-progress-fill {
+      height: 100%;
+      background: #00BCD4;
+      border-radius: 3px;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部状态栏 -->
+  <div class="header">
+    <div class="header-item">
+      <span>💰</span>
+      <span id="gold-display">100</span>
+    </div>
+    <div class="header-item">
+      <span>🏆</span>
+      <span>第 <span id="round-display">1</span> 局</span>
+    </div>
+    <div class="timer">
+      ⏱️ <span id="time-display">5:00</span>
+    </div>
+  </div>
+
+  <!-- 主游戏区 -->
+  <div id="game">
+    <!-- 农田区 -->
+    <div class="field">
+      <div class="section-title">🌾 农田区</div>
+      <div class="selection-hint">点击选择作物，再点击空地种植（无限）</div>
+      <div class="seeds-bar" id="seeds-bar">
+        <!-- 种子栏动态生成 -->
+      </div>
+      <div class="farm-grid" id="farm-grid">
+        <!-- 农田格子动态生成 -->
+      </div>
+    </div>
+
+    <!-- 制作区 -->
+    <div class="kitchen">
+      <div class="section-title">👨‍🍳 制作区</div>
+      
+      <!-- 水井 -->
+      <div class="well-box">
+        <div class="well-title">🚰 水井（免费取水）</div>
+        <button class="well-btn" id="well-btn" onclick="fetchWater()">打水</button>
+        <div class="well-progress" id="well-progress" style="display:none;">
+          <div class="well-progress-fill" id="well-progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+      
+      <div class="inventory-box">
+        <div class="inventory-title">📦 原料仓库（点击选择）</div>
+        <div class="inventory-items" id="inventory-items">
+          <div style="color: #999; font-size: 12px;">暂无原料</div>
+        </div>
+      </div>
+      
+      <div class="recipes-box">
+        <div class="inventory-title">📖 配方书（点击制作）</div>
+        <div id="recipes-list">
+          <!-- 配方动态生成 -->
+        </div>
+      </div>
+      
+      <div class="crafting-queue">
+        <div class="inventory-title">⏳ 制作中</div>
+        <div id="crafting-list">
+          <div style="color: #999; font-size: 12px;">暂无制作中的物品</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 市场区 -->
+    <div class="market">
+      <div class="section-title">🏪 市场（购买原料）</div>
+      <div class="selection-hint">花钱购买原料，省时省力</div>
+      <div class="market-items" id="market-items">
+        <!-- 市场物品动态生成 -->
+      </div>
+    </div>
+
+    <!-- 售卖区 -->
+    <div class="shop">
+      <div class="section-title">💰 售卖区</div>
+      
+      <div class="counter-box">
+        <div class="inventory-title">🥐 柜台（点击选择）</div>
+        <div class="counter-items" id="counter-items">
+          <div style="color: #999; font-size: 12px; width: 100%; text-align: center;">暂无面包</div>
+        </div>
+      </div>
+      
+      <div class="customers-box">
+        <div class="inventory-title">👥 顾客（点击出售）</div>
+        <div id="customers-list">
+          <div style="color: #999; font-size: 12px; text-align: center; padding: 15px;">等待顾客光临...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 游戏结束弹窗 -->
+  <div class="modal-overlay" id="game-over-modal">
+    <div class="modal">
+      <div class="modal-title">🎉 本局结束！</div>
+      <div class="modal-content">
+        <div class="modal-stats">
+          <div class="stat-row">
+            <span>⏱️ 游戏时长</span>
+            <span>5:00</span>
+          </div>
+          <div class="stat-row">
+            <span>💰 本局收益</span>
+            <span id="round-gold">0</span>
+          </div>
+          <div class="stat-row">
+            <span>🍞 售出面包</span>
+            <span id="round-breads">0</span>
+          </div>
+          <div class="stat-row">
+            <span>💵 总金币</span>
+            <span id="total-gold">0</span>
+          </div>
+        </div>
+      </div>
+      <button class="modal-btn" onclick="nextRound()">下一局 →</button>
+    </div>
+  </div>
+
+  <!-- 升级商店弹窗 -->
+  <div class="modal-overlay" id="upgrade-modal">
+    <div class="modal">
+      <div class="modal-title">🏪 升级商店</div>
+      <div class="modal-content">
+        用金币购买永久升级，让下一局更轻松！
+      </div>
+      <div class="upgrade-shop" id="upgrade-shop">
+        <!-- 升级项动态生成 -->
+      </div>
+      <button class="modal-btn" onclick="startNextRound()">开始下一局</button>
+    </div>
+  </div>
+
+  <!-- 提示信息 -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ==================== 游戏配置 ====================
+    const CROP_DATA = {
+      wheat: { name: '小麦', emoji: '🌾', growTime: 5, output: 'flour', outputCount: 2 },
+      cow: { name: '奶牛', emoji: '🐄', growTime: 10, output: 'milk', outputCount: 1 },
+      sugarcane: { name: '甘蔗', emoji: '🎋', growTime: 8, output: 'sugar', outputCount: 1 },
+      chicken: { name: '母鸡', emoji: '🐔', growTime: 12, output: 'egg', outputCount: 1 }
+    };
+
+    const ITEM_DATA = {
+      flour: { name: '面粉', emoji: '🌾' },
+      milk: { name: '牛奶', emoji: '🥛' },
+      sugar: { name: '糖', emoji: '🍬' },
+      egg: { name: '鸡蛋', emoji: '🥚' },
+      water: { name: '水', emoji: '💧' },
+      dough: { name: '面团', emoji: '🥟' },
+      butter_dough: { name: '黄油面团', emoji: '🧈' },
+      cake_batter: { name: '蛋糕糊', emoji: '🥣' },
+      white_bread: { name: '白面包', emoji: '🍞', price: 20 },
+      butter_bread: { name: '黄油面包', emoji: '🥐', price: 50 },
+      sweet_bread: { name: '甜面包', emoji: '🥖', price: 80 },
+      cake: { name: '蛋糕', emoji: '🍰', price: 150 }
+    };
+
+    const RECIPES = [
+      { id: 'dough', name: '面团', ingredients: ['flour', 'water'], time: 1, output: 'dough' },
+      { id: 'white_bread', name: '白面包', ingredients: ['dough'], time: 2, output: 'white_bread' },
+      { id: 'butter_dough', name: '黄油面团', ingredients: ['dough', 'milk'], time: 2, output: 'butter_dough' },
+      { id: 'butter_bread', name: '黄油面包', ingredients: ['butter_dough'], time: 3, output: 'butter_bread' },
+      { id: 'cake_batter', name: '蛋糕糊', ingredients: ['dough', 'sugar', 'egg'], time: 3, output: 'cake_batter' },
+      { id: 'cake', name: '蛋糕', ingredients: ['cake_batter'], time: 5, output: 'cake' }
+    ];
+
+    const MARKET_ITEMS = [
+      { id: 'flour', name: '面粉', emoji: '🌾', price: 5, desc: '制作面团必备' },
+      { id: 'water', name: '水', emoji: '💧', price: 3, desc: '制作面团必备' },
+      { id: 'milk', name: '牛奶', emoji: '🥛', price: 10, desc: '制作黄油面包' },
+      { id: 'sugar', name: '糖', emoji: '🍬', price: 8, desc: '制作蛋糕' },
+      { id: 'egg', name: '鸡蛋', emoji: '🥚', price: 12, desc: '制作蛋糕' }
+    ];
+
+    const UPGRADES = [
+      { id: 'grow_speed', name: '生长加速', emoji: '⚡', desc: '所有作物生长时间-20%', price: 1000, effect: () => { state.permanent.growSpeed *= 0.8; } },
+      { id: 'craft_speed', name: '制作加速', emoji: '🔥', desc: '制作时间-20%', price: 1500, effect: () => { state.permanent.craftSpeed *= 0.8; } },
+      { id: 'well_speed', name: '水井加速', emoji: '🚰', desc: '打水时间-30%', price: 800, effect: () => { state.permanent.wellSpeed *= 0.7; } },
+      { id: 'unlock_cow', name: '解锁奶牛', emoji: '🐄', desc: '局内可种植奶牛', price: 200, effect: () => { state.permanent.unlockedCrops.push('cow'); } },
+      { id: 'unlock_sugarcane', name: '解锁甘蔗', emoji: '🎋', desc: '局内可种植甘蔗', price: 800, effect: () => { state.permanent.unlockedCrops.push('sugarcane'); } },
+      { id: 'unlock_chicken', name: '解锁母鸡', emoji: '🐔', desc: '局内可种植母鸡', price: 1500, effect: () => { state.permanent.unlockedCrops.push('chicken'); } }
+    ];
+
+    const CUSTOMER_TYPES = [
+      { emoji: '👨', names: ['张先生', '李先生', '王先生'] },
+      { emoji: '👩', names: ['张女士', '李女士', '王女士'] },
+      { emoji: '👴', names: ['老爷爷', '老大爷'] },
+      { emoji: '👵', names: ['老奶奶', '老大娘'] },
+      { emoji: '👦', names: ['小明', '小刚', '小强'] },
+      { emoji: '👧', names: ['小红', '小丽', '小美'] }
+    ];
+
+    // ==================== 游戏状态 ====================
+    const state = {
+      gold: 100,
+      round: 1,
+      time: 300,
+      isPlaying: false,
+      
+      // 永久升级
+      permanent: {
+        growSpeed: 1,
+        craftSpeed: 1,
+        wellSpeed: 1,
+        unlockedCrops: ['wheat', 'cow', 'sugarcane', 'chicken']
+      },
+      
+      // 本局状态
+      crops: [],
+      inventory: {},
+      crafting: [],
+      counter: {},
+      customers: [],
+      
+      // 水井状态
+      well: {
+        fetching: false,
+        finishTime: 0
+      },
+      
+      // 选中状态
+      selectedSeed: null,
+      selectedIngredient: null,
+      selectedBread: null,
+      
+      // 统计
+      stats: {
+        breadsSold: 0,
+        goldEarned: 0
+      }
+    };
+
+    // ==================== 初始化 ====================
+    function init() {
+      // 初始化农田格子 (9格)
+      const farmGrid = document.getElementById('farm-grid');
+      farmGrid.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const plot = document.createElement('div');
+        plot.className = 'farm-plot';
+        plot.dataset.index = i;
+        plot.onclick = () => onPlotClick(i);
+        farmGrid.appendChild(plot);
+      }
+      
+      startNewRound();
+    }
+
+    function startNewRound() {
+      // 重置本局状态
+      state.time = 300;
+      state.isPlaying = true;
+      state.crops = [];
+      state.inventory = {};
+      state.crafting = [];
+      state.counter = {};
+      state.customers = [];
+      state.well = { fetching: false, finishTime: 0 };
+      state.selectedSeed = null;
+      state.selectedIngredient = null;
+      state.selectedBread = null;
+      state.stats = { breadsSold: 0, goldEarned: 0 };
+      
+      // 更新UI
+      updateUI();
+      
+      // 关闭弹窗
+      document.getElementById('game-over-modal').classList.remove('active');
+      document.getElementById('upgrade-modal').classList.remove('active');
+      
+      // 开始游戏循环
+      startGameLoop();
+      
+      showToast('第 ' + state.round + ' 局开始！种植小麦→打水→做面团→烤面包！');
+    }
+
+    // ==================== 游戏循环 ====================
+    let gameInterval;
+    let customerInterval;
+    
+    function startGameLoop() {
+      clearInterval(gameInterval);
+      clearInterval(customerInterval);
+      
+      gameInterval = setInterval(() => {
+        if (!state.isPlaying) return;
+        
+        state.time--;
+        if (state.time <= 0) {
+          endGame();
+          return;
+        }
+        
+        // 更新作物
+        updateCrops();
+        
+        // 更新水井
+        updateWell();
+        
+        // 更新制作
+        updateCrafting();
+        
+        // 更新顾客耐心
+        updateCustomers();
+        
+        // 更新UI
+        updateTimer();
+      }, 1000);
+      
+      // 顾客生成
+      customerInterval = setInterval(() => {
+        if (!state.isPlaying) return;
+        if (state.customers.length < 5) {
+          spawnCustomer();
+        }
+      }, 3000 + Math.random() * 5000);
+    }
+
+    // ==================== 水井系统 ====================
+    function fetchWater() {
+      if (state.well.fetching) return;
+      
+      const fetchTime = Math.floor(3 * state.permanent.wellSpeed);
+      state.well.fetching = true;
+      state.well.finishTime = Date.now() + fetchTime * 1000;
+      
+      document.getElementById('well-btn').disabled = true;
+      document.getElementById('well-btn').textContent = '打水中...';
+      document.getElementById('well-progress').style.display = 'block';
+      
+      showToast('开始打水，需要 ' + fetchTime + ' 秒...');
+    }
+
+    function updateWell() {
+      if (!state.well.fetching) return;
+      
+      const now = Date.now();
+      const progress = (now - (state.well.finishTime - 3000 * state.permanent.wellSpeed)) / (3000 * state.permanent.wellSpeed);
+      const percent = Math.min(100, Math.floor(progress * 100));
+      
+      document.getElementById('well-progress-fill').style.width = percent + '%';
+      
+      if (now >= state.well.finishTime) {
+        // 打水完成
+        state.well.fetching = false;
+        state.inventory.water = (state.inventory.water || 0) + 1;
+        
+        document.getElementById('well-btn').disabled = false;
+        document.getElementById('well-btn').textContent = '打水';
+        document.getElementById('well-progress').style.display = 'none';
+        document.getElementById('well-progress-fill').style.width = '0%';
+        
+        updateInventory();
+        updateRecipes();
+        showToast('获得 1 个水！');
+      }
+    }
+
+    // ==================== 农田系统 ====================
+    function updateSeedsBar() {
+      const seedsBar = document.getElementById('seeds-bar');
+      seedsBar.innerHTML = '';
+      
+      for (const [type, data] of Object.entries(CROP_DATA)) {
+        const seedItem = document.createElement('div');
+        seedItem.className = 'seed-item' + (state.selectedSeed === type ? ' selected' : '');
+        
+        const isUnlocked = state.permanent.unlockedCrops.includes(type);
+        if (!isUnlocked) seedItem.classList.add('locked');
+        
+        seedItem.innerHTML = `
+          <span>${data.emoji}</span>
+          <span>${data.name}</span>
+          <span class="unlimited">∞</span>
+        `;
+        
+        if (isUnlocked) {
+          seedItem.onclick = () => selectSeed(type);
+        }
+        
+        seedsBar.appendChild(seedItem);
+      }
+    }
+
+    function selectSeed(type) {
+      state.selectedSeed = state.selectedSeed === type ? null : type;
+      state.selectedIngredient = null;
+      state.selectedBread = null;
+      updateSeedsBar();
+      showToast('已选择 ' + CROP_DATA[type].name + '（无限），点击空地种植');
+    }
+
+    function onPlotClick(index) {
+      const plot = state.crops[index];
+      
+      // 收获
+      if (plot && plot.ready && !plot.harvested) {
+        harvestCrop(index);
+        return;
+      }
+      
+      // 种植（无限种子）
+      if (!plot && state.selectedSeed) {
+        plantCrop(index, state.selectedSeed);
+      }
+    }
+
+    function plantCrop(index, type) {
+      const data = CROP_DATA[type];
+      const growTime = Math.floor(data.growTime * state.permanent.growSpeed);
+      
+      state.crops[index] = {
+        type,
+        plantTime: Date.now(),
+        readyTime: Date.now() + growTime * 1000,
+        ready: false,
+        harvested: false
+      };
+      
+      state.selectedSeed = null;
+      updateSeedsBar();
+      updateFarmGrid();
+      showToast('种植了 ' + data.name + '，需要 ' + growTime + ' 秒成熟');
+    }
+
+    function harvestCrop(index) {
+      const crop = state.crops[index];
+      const data = CROP_DATA[crop.type];
+      
+      crop.harvested = true;
+      
+      // 添加原料到仓库
+      const output = data.output;
+      state.inventory[output] = (state.inventory[output] || 0) + data.outputCount;
+      
+      updateFarmGrid();
+      updateInventory();
+      updateRecipes();
+      showToast('收获了 ' + data.outputCount + ' 个' + ITEM_DATA[output].name + '！');
+      
+      // 清空格子
+      setTimeout(() => {
+        state.crops[index] = null;
+        updateFarmGrid();
+      }, 300);
+    }
+
+    function updateCrops() {
+      const now = Date.now();
+      let changed = false;
+      
+      state.crops.forEach(crop => {
+        if (crop && !crop.ready && !crop.harvested && now >= crop.readyTime) {
+          crop.ready = true;
+          changed = true;
+        }
+      });
+      
+      if (changed) updateFarmGrid();
+    }
+
+    function updateFarmGrid() {
+      const plots = document.querySelectorAll('.farm-plot');
+      
+      plots.forEach((plotEl, index) => {
+        const crop = state.crops[index];
+        plotEl.className = 'farm-plot';
+        plotEl.innerHTML = '';
+        
+        if (!crop) {
+          plotEl.innerHTML = '<span style="font-size:24px;opacity:0.3;">🌱</span>';
+          return;
+        }
+        
+        const data = CROP_DATA[crop.type];
+        
+        if (crop.harvested) {
+          plotEl.innerHTML = '<span style="font-size:24px;opacity:0.3;">✨</span>';
+        } else if (crop.ready) {
+          plotEl.classList.add('planted', 'ready');
+          plotEl.innerHTML = `
+            <span class="crop-icon">${data.emoji}</span>
+            <span class="plot-status">可收获！</span>
+          `;
+        } else {
+          plotEl.classList.add('planted');
+          const progress = (Date.now() - crop.plantTime) / (crop.readyTime - crop.plantTime);
+          const percent = Math.min(100, Math.floor(progress * 100));
+          plotEl.innerHTML = `
+            <span class="crop-icon">🌱</span>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${percent}%"></div>
+            </div>
+            <span class="plot-status">${percent}%</span>
+          `;
+        }
+      });
+    }
+
+    // ==================== 市场系统 ====================
+    function updateMarket() {
+      const marketItems = document.getElementById('market-items');
+      marketItems.innerHTML = '';
+      
+      MARKET_ITEMS.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'market-item';
+        
+        const canAfford = state.gold >= item.price;
+        
+        itemEl.innerHTML = `
+          <div class="market-item-icon">${item.emoji}</div>
+          <div class="market-item-info">
+            <div class="market-item-name">${item.name}</div>
+            <div class="market-item-desc">${item.desc}</div>
+          </div>
+          <button class="market-btn" ${!canAfford ? 'disabled' : ''} onclick="buyItem('${item.id}')">
+            💰${item.price}
+          </button>
+        `;
+        
+        marketItems.appendChild(itemEl);
+      });
+    }
+
+    function buyItem(itemId) {
+      const item = MARKET_ITEMS.find(i => i.id === itemId);
+      if (!item || state.gold < item.price) {
+        showToast('金币不足！');
+        return;
+      }
+      
+      state.gold -= item.price;
+      state.inventory[itemId] = (state.inventory[itemId] || 0) + 1;
+      
+      updateHeader();
+      updateMarket();
+      updateInventory();
+      updateRecipes();
+      showToast('购买了 1 个' + item.name + '！');
+    }
+
+    // ==================== 制作系统 ====================
+    function updateInventory() {
+      const invItems = document.getElementById('inventory-items');
+      
+      const hasItems = Object.keys(state.inventory).length > 0;
+      if (!hasItems) {
+        invItems.innerHTML = '<div style="color: #999; font-size: 12px;">暂无原料，去打水或去市场购买</div>';
+        return;
+      }
+      
+      invItems.innerHTML = '';
+      for (const [item, count] of Object.entries(state.inventory)) {
+        if (count <= 0) continue;
+        
+        const itemEl = document.createElement('div');
+        itemEl.className = 'inv-item' + (state.selectedIngredient === item ? ' selected' : '');
+        itemEl.innerHTML = `
+          <span>${ITEM_DATA[item].emoji}</span>
+          <span class="count">${count}</span>
+        `;
+        itemEl.onclick = () => selectIngredient(item);
+        itemEl.title = ITEM_DATA[item].name;
+        invItems.appendChild(itemEl);
+      }
+    }
+
+    function selectIngredient(item) {
+      state.selectedIngredient = state.selectedIngredient === item ? null : item;
+      state.selectedSeed = null;
+      state.selectedBread = null;
+      updateInventory();
+      updateRecipes();
+      showToast('已选择 ' + ITEM_DATA[item].name);
+    }
+
+    function updateRecipes() {
+      const recipesList = document.getElementById('recipes-list');
+      recipesList.innerHTML = '';
+      
+      RECIPES.forEach(recipe => {
+        const recipeEl = document.createElement('div');
+        
+        // 检查是否可以制作
+        const canCraft = recipe.ingredients.every(ing => 
+          (state.inventory[ing] || 0) > 0
+        );
+        
+        recipeEl.className = 'recipe-item' + (canCraft ? ' can-craft' : '');
+        
+        const ingHtml = recipe.ingredients.map(ing => 
+          `<span class="recipe-ing">${ITEM_DATA[ing].emoji}</span>`
+        ).join('');
+        
+        const time = Math.floor(recipe.time * state.permanent.craftSpeed);
+        
+        recipeEl.innerHTML = `
+          <div class="recipe-ingredients">${ingHtml}</div>
+          <span class="recipe-arrow">→</span>
+          <span class="recipe-result">${ITEM_DATA[recipe.output].emoji}</span>
+          <span class="recipe-time">${time}秒</span>
+        `;
+        
+        recipeEl.onclick = () => startCrafting(recipe);
+        recipesList.appendChild(recipeEl);
+      });
+    }
+
+    function startCrafting(recipe) {
+      // 检查原料
+      const hasIngredients = recipe.ingredients.every(ing => 
+        (state.inventory[ing] || 0) > 0
+      );
+      
+      if (!hasIngredients) {
+        showToast('原料不足！');
+        return;
+      }
+      
+      // 消耗原料
+      recipe.ingredients.forEach(ing => {
+        state.inventory[ing]--;
+        if (state.inventory[ing] <= 0) delete state.inventory[ing];
+      });
+      
+      // 开始制作
+      const craftTime = Math.floor(recipe.time * state.permanent.craftSpeed);
+      state.crafting.push({
+        recipe,
+        startTime: Date.now(),
+        finishTime: Date.now() + craftTime * 1000,
+        finished: false
+      });
+      
+      state.selectedIngredient = null;
+      updateInventory();
+      updateRecipes();
+      updateCraftingList();
+      showToast('开始制作 ' + recipe.name + '...');
+    }
+
+    function updateCrafting() {
+      const now = Date.now();
+      let changed = false;
+      
+      state.crafting.forEach(craft => {
+        if (!craft.finished && now >= craft.finishTime) {
+          craft.finished = true;
+          
+          // 产出
+          const output = craft.recipe.output;
+          if (['white_bread', 'butter_bread', 'sweet_bread', 'cake'].includes(output)) {
+            // 面包放到柜台
+            state.counter[output] = (state.counter[output] || 0) + 1;
+            updateCounter();
+          } else {
+            // 半成品放到仓库
+            state.inventory[output] = (state.inventory[output] || 0) + 1;
+            updateInventory();
+          }
+          
+          changed = true;
+          showToast(ITEM_DATA[output].name + ' 制作完成！');
+        }
+      });
+      
+      // 清理已完成的
+      state.crafting = state.crafting.filter(c => !c.finished);
+      if (changed || state.crafting.length === 0) {
+        updateCraftingList();
+      }
+    }
+
+    function updateCraftingList() {
+      const craftingList = document.getElementById('crafting-list');
+      
+      if (state.crafting.length === 0) {
+        craftingList.innerHTML = '<div style="color: #999; font-size: 12px;">暂无制作中的物品</div>';
+        return;
+      }
+      
+      craftingList.innerHTML = '';
+      const now = Date.now();
+      
+      state.crafting.forEach(craft => {
+        const recipe = craft.recipe;
+        const progress = (now - craft.startTime) / (craft.finishTime - craft.startTime);
+        const percent = Math.min(100, Math.floor(progress * 100));
+        
+        const craftEl = document.createElement('div');
+        craftEl.className = 'crafting-item';
+        craftEl.innerHTML = `
+          <span style="font-size:20px;">${ITEM_DATA[recipe.output].emoji}</span>
+          <div class="crafting-progress">
+            <div class="crafting-fill" style="width: ${percent}%"></div>
+          </div>
+          <span style="font-size:11px;color:#666;">${percent}%</span>
+        `;
+        craftingList.appendChild(craftEl);
+      });
+    }
+
+    // ==================== 售卖系统 ====================
+    function updateCounter() {
+      const counterItems = document.getElementById('counter-items');
+      
+      const hasBreads = Object.keys(state.counter).length > 0;
+      if (!hasBreads) {
+        counterItems.innerHTML = '<div style="color: #999; font-size: 12px; width: 100%; text-align: center;">暂无面包，快去制作吧！</div>';
+        return;
+      }
+      
+      counterItems.innerHTML = '';
+      for (const [bread, count] of Object.entries(state.counter)) {
+        if (count <= 0) continue;
+        
+        const itemEl = document.createElement('div');
+        itemEl.className = 'counter-item' + (state.selectedBread === bread ? ' selected' : '');
+        itemEl.innerHTML = `
+          <span class="bread-icon">${ITEM_DATA[bread].emoji}</span>
+          <span class="bread-price">💰${ITEM_DATA[bread].price}</span>
+          <span class="count">${count}</span>
+        `;
+        itemEl.onclick = () => selectBread(bread);
+        counterItems.appendChild(itemEl);
+      }
+    }
+
+    function selectBread(bread) {
+      state.selectedBread = state.selectedBread === bread ? null : bread;
+      state.selectedSeed = null;
+      state.selectedIngredient = null;
+      updateCounter();
+      showToast('已选择 ' + ITEM_DATA[bread].name + '，点击顾客出售');
+    }
+
+    function spawnCustomer() {
+      const types = CUSTOMER_TYPES;
+      const type = types[Math.floor(Math.random() * types.length)];
+      const name = type.names[Math.floor(Math.random() * type.names.length)];
+      
+      // 根据进度决定需求
+      let possibleWants = ['white_bread'];
+      if (state.permanent.unlockedCrops.includes('cow')) possibleWants.push('butter_bread');
+      if (state.permanent.unlockedCrops.includes('sugarcane')) possibleWants.push('sweet_bread');
+      if (state.permanent.unlockedCrops.includes('chicken')) possibleWants.push('cake');
+      
+      const want = possibleWants[Math.floor(Math.random() * possibleWants.length)];
+      
+      const customer = {
+        id: Date.now() + Math.random(),
+        emoji: type.emoji,
+        name,
+        want,
+        patience: 30
+      };
+      
+      state.customers.push(customer);
+      updateCustomersList();
+    }
+
+    function updateCustomers() {
+      let changed = false;
+      
+      state.customers = state.customers.filter(c => {
+        c.patience--;
+        if (c.patience <= 0) changed = true;
+        return c.patience > 0;
+      });
+      
+      if (changed) updateCustomersList();
+    }
+
+    function updateCustomersList() {
+      const customersList = document.getElementById('customers-list');
+      
+      if (state.customers.length === 0) {
+        customersList.innerHTML = '<div style="color: #999; font-size: 12px; text-align: center; padding: 15px;">等待顾客光临...</div>';
+        return;
+      }
+      
+      customersList.innerHTML = '';
+      
+      state.customers.forEach(customer => {
+        const customerEl = document.createElement('div');
+        customerEl.className = 'customer';
+        
+        const wantItem = ITEM_DATA[customer.want];
+        const hasBread = (state.counter[customer.want] || 0) > 0;
+        
+        customerEl.innerHTML = `
+          <div class="customer-avatar">${customer.emoji}</div>
+          <div class="customer-info">
+            <div class="customer-name">${customer.name}</div>
+            <div class="customer-want">
+              想要: <span class="customer-want-emoji">${wantItem.emoji}</span>
+              <span style="color:#8B4513;font-weight:bold;">💰${wantItem.price}</span>
+            </div>
+          </div>
+          <button class="customer-btn" ${!hasBread ? 'disabled' : ''} onclick="sellBread('${customer.id}')">
+            ${hasBread ? '出售' : '缺货'}
+          </button>
+        `;
+        
+        customersList.appendChild(customerEl);
+      });
+    }
+
+    function sellBread(customerId) {
+      const customer = state.customers.find(c => c.id == customerId);
+      if (!customer) return;
+      
+      const want = customer.want;
+      if ((state.counter[want] || 0) <= 0) {
+        showToast('柜台没有 ' + ITEM_DATA[want].name + '！');
+        return;
+      }
+      
+      // 出售
+      state.counter[want]--;
+      if (state.counter[want] <= 0) delete state.counter[want];
+      
+      const price = ITEM_DATA[want].price;
+      state.gold += price;
+      state.stats.goldEarned += price;
+      state.stats.breadsSold++;
+      
+      // 移除顾客
+      state.customers = state.customers.filter(c => c.id != customerId);
+      
+      state.selectedBread = null;
+      updateCounter();
+      updateCustomersList();
+      updateHeader();
+      updateMarket();
+      showToast('售出 ' + ITEM_DATA[want].name + '，获得 💰' + price + '！');
+    }
+
+    // ==================== UI更新 ====================
+    function updateUI() {
+      updateHeader();
+      updateSeedsBar();
+      updateFarmGrid();
+      updateInventory();
+      updateRecipes();
+      updateCraftingList();
+      updateMarket();
+      updateCounter();
+      updateCustomersList();
+    }
+
+    function updateHeader() {
+      document.getElementById('gold-display').textContent = state.gold;
+      document.getElementById('round-display').textContent = state.round;
+    }
+
+    function updateTimer() {
+      const minutes = Math.floor(state.time / 60);
+      const seconds = state.time % 60;
+      document.getElementById('time-display').textContent = 
+        `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    // ==================== 游戏结束 ====================
+    function endGame() {
+      state.isPlaying = false;
+      clearInterval(gameInterval);
+      clearInterval(customerInterval);
+      
+      document.getElementById('round-gold').textContent = state.stats.goldEarned;
+      document.getElementById('round-breads').textContent = state.stats.breadsSold;
+      document.getElementById('total-gold').textContent = state.gold;
+      
+      document.getElementById('game-over-modal').classList.add('active');
+    }
+
+    function nextRound() {
+      document.getElementById('game-over-modal').classList.remove('active');
+      document.getElementById('upgrade-modal').classList.add('active');
+      updateUpgradeShop();
+    }
+
+    function updateUpgradeShop() {
+      const shop = document.getElementById('upgrade-shop');
+      shop.innerHTML = '';
+      
+      UPGRADES.forEach(upgrade => {
+        const upgradeEl = document.createElement('div');
+        upgradeEl.className = 'upgrade-item';
+        
+        const canAfford = state.gold >= upgrade.price;
+        const isUnlocked = 
+          (upgrade.id === 'unlock_cow' && state.permanent.unlockedCrops.includes('cow')) ||
+          (upgrade.id === 'unlock_sugarcane' && state.permanent.unlockedCrops.includes('sugarcane')) ||
+          (upgrade.id === 'unlock_chicken' && state.permanent.unlockedCrops.includes('chicken'));
+        
+        upgradeEl.innerHTML = `
+          <div class="upgrade-icon">${upgrade.emoji}</div>
+          <div class="upgrade-info">
+            <div class="upgrade-name">${upgrade.name}</div>
+            <div class="upgrade-desc">${upgrade.desc}</div>
+          </div>
+          <button class="upgrade-btn" ${!canAfford || isUnlocked ? 'disabled' : ''} onclick="buyUpgrade('${upgrade.id}')">
+            ${isUnlocked ? '已解锁' : '💰' + upgrade.price}
+          </button>
+        `;
+        
+        shop.appendChild(upgradeEl);
+      });
+    }
+
+    function buyUpgrade(upgradeId) {
+      const upgrade = UPGRADES.find(u => u.id === upgradeId);
+      if (!upgrade || state.gold < upgrade.price) return;
+      
+      state.gold -= upgrade.price;
+      upgrade.effect();
+      
+      updateHeader();
+      updateUpgradeShop();
+      showToast('购买了 ' + upgrade.name + '！');
+    }
+
+    function startNextRound() {
+      state.round++;
+      startNewRound();
+    }
+
+    // ==================== 启动游戏 ====================
+    window.onload = init;
+  </script>
+</body>
+</html>
