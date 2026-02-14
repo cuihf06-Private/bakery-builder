@@ -1686,6 +1686,7 @@
       document.getElementById('upgrade-modal').classList.add('active');
       updateUpgradeShop();
     }
+    window.nextRound = nextRound;
 
     function updateUpgradeShop() {
       const shop = document.getElementById('upgrade-shop');
@@ -1732,6 +1733,7 @@
       state.round++;
       startNewRound();
     }
+    window.startNextRound = startNextRound;
 
     // ==================== 启动游戏 ====================
     window.onload = init;
