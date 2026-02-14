@@ -938,24 +938,66 @@
     // ==================== 游戏配置 ====================
     // ========== 多用户多关卡存档功能 ==========
     function saveGameWithUser() {
-      let username = localStorage.getItem('bakery_last_user') || '';
-      username = prompt('请输入用户名（用于存档标识）', username);
-      if (!username) { showToast('未输入用户名，存档取消'); return; }
-      localStorage.setItem('bakery_last_user', username);
-      const now = new Date();
-      const saveTime = now.toLocaleString();
-      const saveObj = {
-        username,
-        time: saveTime,
-        round: state.round,
-        state: JSON.parse(JSON.stringify(state))
+      // 弹出自定义用户名输入框
+      showUsernameModal(function(username) {
+        if (!username) { showToast('未输入用户名，存档取消'); return; }
+        localStorage.setItem('bakery_last_user', username);
+        const now = new Date();
+        const saveTime = now.toLocaleString();
+        const saveObj = {
+          username,
+          time: saveTime,
+          round: state.round,
+          state: JSON.parse(JSON.stringify(state))
+        };
+        // 追加到存档列表
+        let saves = [];
+        try { saves = JSON.parse(localStorage.getItem('bakery_saves')||'[]'); } catch {}
+        saves.push(saveObj);
+        localStorage.setItem('bakery_saves', JSON.stringify(saves));
+        showToast('存档成功！用户名：' + username + '，第' + state.round + '关');
+      });
+    }
+
+    // 美观的用户名输入模态框
+    function showUsernameModal(onSubmit) {
+      let lastUser = localStorage.getItem('bakery_last_user') || '';
+      // 避免重复弹出
+      if (document.getElementById('username-modal-bg')) return;
+      let html = `<div class="modal-overlay active" id="username-modal-bg" style="z-index:2001;">
+        <div class="modal">
+          <div class="modal-title">请输入用户名</div>
+          <div class="modal-content">
+            <input id="username-input" type="text" value="${lastUser.replace(/"/g,'&quot;')}" placeholder="用户名" style="width:80%;padding:8px 12px;font-size:16px;border-radius:8px;border:1px solid #DEB887;outline:none;" maxlength="16" autofocus />
+          </div>
+          <div style="margin-top:10px;">
+            <button class="modal-btn" id="username-ok-btn">确定</button>
+            <button class="modal-btn" style="background:#ccc;color:#333;margin-left:12px;" id="username-cancel-btn">取消</button>
+          </div>
+        </div>
+      </div>`;
+      const modal = document.createElement('div');
+      modal.innerHTML = html;
+      document.body.appendChild(modal);
+      // 事件绑定
+      setTimeout(()=>{
+        document.getElementById('username-input').focus();
+      }, 100);
+      document.getElementById('username-ok-btn').onclick = function() {
+        const val = document.getElementById('username-input').value.trim();
+        closeUsernameModal();
+        onSubmit(val);
       };
-      // 追加到存档列表
-      let saves = [];
-      try { saves = JSON.parse(localStorage.getItem('bakery_saves')||'[]'); } catch {}
-      saves.push(saveObj);
-      localStorage.setItem('bakery_saves', JSON.stringify(saves));
-      showToast('存档成功！用户名：' + username + '，第' + state.round + '关');
+      document.getElementById('username-cancel-btn').onclick = function() {
+        closeUsernameModal();
+        onSubmit(null);
+      };
+      document.getElementById('username-input').onkeydown = function(e) {
+        if (e.key === 'Enter') document.getElementById('username-ok-btn').click();
+      };
+      window.closeUsernameModal = function() {
+        if (modal && modal.parentNode) modal.parentNode.removeChild(modal);
+      };
     }
 
     function showLoadDialog() {
