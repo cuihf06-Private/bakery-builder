@@ -241,6 +241,9 @@
         font-size: 0.7rem; /* 字体缩小到0.7rem */
         gap: 0.2rem; /* 间距缩小到0.2rem */
       }
+      .seed-item span:first-child {
+        font-size: 1.3rem; /* emoji图标缩小到1.3rem */
+      }
     }
 
     /* 屏幕高度<600px时，进一步缩小种子项 */
@@ -250,10 +253,18 @@
         font-size: 0.65rem; /* 字体缩小到0.65rem */
         gap: 0.15rem; /* 间距缩小到0.15rem */
       }
+      .seed-item span:first-child {
+        font-size: 1.1rem; /* emoji图标缩小到1.1rem */
+      }
     }
 
     .seed-item span {
       flex-shrink: 0; /* 不允许压缩 */
+    }
+
+    /* 种子项中的emoji图标 */
+    .seed-item span:first-child {
+      font-size: 1.2rem; /* emoji图标大小1.2rem */
     }
 
     /* ==================== 种子项网格定位 ==================== */
@@ -432,14 +443,14 @@
 
     /* ==================== 作物图标 ==================== */
     .crop-icon {
-      font-size: 1.8rem; /* 图标大小1.8rem */
+      font-size: 2.64rem; /* 图标大小2.64rem (2.2 * 1.2) */
       margin-bottom: 0.2rem; /* 底部外边距0.2rem */
     }
 
     /* 屏幕高度<800px时，缩小作物图标 */
     @media (max-height: 800px) {
       .crop-icon {
-        font-size: 1.5rem; /* 图标缩小到1.5rem */
+        font-size: 2.28rem; /* 图标缩小到2.28rem (1.9 * 1.2) */
         margin-bottom: 0.15rem; /* 底部外边距缩小到0.15rem */
       }
     }
@@ -447,7 +458,7 @@
     /* 屏幕高度<700px时，进一步缩小作物图标 */
     @media (max-height: 700px) {
       .crop-icon {
-        font-size: 1.35rem; /* 图标缩小到1.35rem */
+        font-size: 2.1rem; /* 图标缩小到2.1rem (1.75 * 1.2) */
         margin-bottom: 0.12rem; /* 底部外边距缩小到0.12rem */
       }
     }
@@ -455,7 +466,7 @@
     /* 屏幕高度<600px时，继续缩小作物图标 */
     @media (max-height: 600px) {
       .crop-icon {
-        font-size: 1.2rem; /* 图标缩小到1.2rem */
+        font-size: 1.92rem; /* 图标缩小到1.92rem (1.6 * 1.2) */
         margin-bottom: 0.1rem; /* 底部外边距缩小到0.1rem */
       }
     }
@@ -463,7 +474,7 @@
     /* 屏幕高度<500px时，最小作物图标 */
     @media (max-height: 500px) {
       .crop-icon {
-        font-size: 1rem; /* 图标缩小到1rem */
+        font-size: 1.62rem; /* 图标缩小到1.62rem (1.35 * 1.2) */
         margin-bottom: 0.08rem; /* 底部外边距缩小到0.08rem */
       }
     }
@@ -647,28 +658,37 @@
     }
 
     /* ==================== 单个配方项 ==================== */
-    /* 每个配方占屏幕纵向10%高度 */
+    /* 每个配方占屏幕纵向9%高度 (10% * 0.9) */
     .recipe-item {
       display: flex;
       align-items: center; /* 垂直居中 */
-      gap: 0.4rem; /* 子元素间距0.4rem */
-      padding: 0.4rem; /* 内边距0.4rem */
-      margin-bottom: 0.4rem; /* 底部外边距0.4rem */
+      gap: 0.3rem; /* 子元素间距0.3rem */
+      padding: 0.36rem; /* 内边距0.36rem (0.4 * 0.9) */
+      margin-bottom: 0.36rem; /* 底部外边距0.36rem (0.4 * 0.9) */
       background: white; /* 白色背景 */
       border-radius: 0.5rem; /* 圆角0.5rem */
       border: 0.12rem solid #DEB887; /* 边框宽度0.12rem */
       cursor: pointer; /* 鼠标指针 */
       transition: all 0.3s; /* 过渡动画0.3秒 */
       font-size: 0.8rem; /* 字体大小0.8rem */
-      height: 10vh; /* 占视口高度的10% */
-      min-height: 10vh; /* 最小高度10vh，防止压缩 */
-      max-height: 10vh; /* 最大高度10vh，防止拉伸 */
+      height: 9vh; /* 占视口高度的9% (10vh * 0.9) */
+      min-height: 9vh; /* 最小高度9vh，防止压缩 */
+      max-height: 9vh; /* 最大高度9vh，防止拉伸 */
       flex-shrink: 0; /* 不允许压缩 */
     }
 
     /* 最后一个配方项无底部外边距 */
     .recipe-item:last-child {
       margin-bottom: 0;
+    }
+
+    /* 第五个配方项：缩窄横向间距 */
+    .recipe-item:nth-child(5) {
+      gap: 0.05rem; /* 子元素间距缩小到0.05rem，几乎没有间距 */
+    }
+
+    .recipe-item:nth-child(5) .recipe-ingredients {
+      gap: 0.05rem; /* 原料图标间距缩小到0.05rem */
     }
 
     /* 配方项鼠标悬停效果 */
@@ -693,7 +713,7 @@
 
     /* 单个原料图标 */
     .recipe-ing {
-      font-size: 2.5rem; /* 图标大小2.5rem */
+      font-size: 2rem; /* 图标大小2rem */
       flex-shrink: 0; /* 不允许压缩 */
       line-height: 1; /* 行高1，紧凑显示 */
     }
@@ -707,7 +727,7 @@
 
     /* 配方结果图标 */
     .recipe-result {
-      font-size: 3rem; /* 图标大小3rem */
+      font-size: 2.4rem; /* 图标大小2.4rem */
       margin-left: auto; /* 自动左边距，推到右侧 */
       flex-shrink: 0; /* 不允许压缩 */
       line-height: 1; /* 行高1，紧凑显示 */
@@ -727,13 +747,13 @@
         gap: 0.25rem; /* 间距缩小到0.25rem */
       }
       .recipe-ing {
-        font-size: 2.2rem; /* 原料图标缩小到2.2rem */
+        font-size: 1.8rem; /* 原料图标缩小到1.8rem */
       }
       .recipe-arrow {
-        font-size: 1.3rem; /* 箭头缩小到1.3rem */
+        font-size: 1.2rem; /* 箭头缩小到1.2rem */
       }
       .recipe-result {
-        font-size: 2.7rem; /* 结果图标缩小到2.7rem */
+        font-size: 2.2rem; /* 结果图标缩小到2.2rem */
       }
     }
 
@@ -743,13 +763,13 @@
         gap: 0.2rem; /* 间距缩小到0.2rem */
       }
       .recipe-ing {
-        font-size: 2rem; /* 原料图标缩小到2rem */
+        font-size: 1.6rem; /* 原料图标缩小到1.6rem */
       }
       .recipe-arrow {
-        font-size: 1.2rem; /* 箭头缩小到1.2rem */
+        font-size: 1.1rem; /* 箭头缩小到1.1rem */
       }
       .recipe-result {
-        font-size: 2.5rem; /* 结果图标缩小到2.5rem */
+        font-size: 2rem; /* 结果图标缩小到2rem */
       }
     }
 
@@ -759,13 +779,13 @@
         gap: 0.15rem; /* 间距缩小到0.15rem */
       }
       .recipe-ing {
-        font-size: 1.8rem; /* 原料图标缩小到1.8rem */
+        font-size: 1.4rem; /* 原料图标缩小到1.4rem */
       }
       .recipe-arrow {
-        font-size: 1.1rem; /* 箭头缩小到1.1rem */
+        font-size: 1rem; /* 箭头缩小到1rem */
       }
       .recipe-result {
-        font-size: 2.3rem; /* 结果图标缩小到2.3rem */
+        font-size: 1.8rem; /* 结果图标缩小到1.8rem */
       }
     }
 
@@ -952,69 +972,65 @@
     .counter-box {
       background: #FFF8DC; /* 浅黄色背景 */
       border-radius: 0.6rem; /* 圆角0.6rem */
-      padding: 0.6rem; /* 内边距0.6rem */
-      margin-bottom: 0.75rem; /* 底部外边距0.75rem */
-      min-height: 5rem; /* 最小高度5rem */
+      padding: 0.4rem 0.6rem; /* 上下0.4rem，左右0.6rem */
+      margin-bottom: 0.5rem; /* 底部外边距0.5rem */
+      flex-shrink: 0; /* 不允许压缩 */
+      display: flex;
+      flex-direction: column; /* 垂直排列子元素 */
+      min-height: auto; /* 最小高度自动，根据内容调整 */
     }
 
     /* 柜台面包容器 */
     .counter-items {
       display: flex;
       flex-wrap: wrap; /* 允许换行 */
-      gap: 0.4rem; /* 项目间距0.4rem */
+      gap: 0.1rem; /* 项目间距0.1rem */
+      align-content: flex-start; /* 内容顶部对齐 */
+      width: 100%; /* 宽度占满父容器 */
     }
 
     /* 单个柜台面包项 */
     .counter-item {
-      width: 3.1rem; /* 宽度3.1rem */
-      height: 3.1rem; /* 高度3.1rem */
-      background: white; /* 白色背景 */
-      border-radius: 0.5rem; /* 圆角0.5rem */
+      width: 1.55rem; /* 宽度1.55rem (3.1 / 2) */
+      height: 1.55rem; /* 高度1.55rem (3.1 / 2) */
       display: flex;
-      flex-direction: column; /* 垂直排列子元素 */
       align-items: center; /* 水平居中 */
       justify-content: center; /* 垂直居中 */
-      border: 0.12rem solid #DEB887; /* 边框宽度0.12rem */
-      cursor: pointer; /* 鼠标指针 */
-      transition: all 0.3s; /* 过渡动画0.3秒 */
-      position: relative; /* 相对定位，用于数量标签绝对定位 */
-    }
-
-    /* 柜台面包项鼠标悬停效果 */
-    .counter-item:hover {
-      transform: scale(1.05); /* 放大到105% */
-      border-color: #8B4513; /* 边框变为深棕色 */
-    }
-
-    /* 柜台面包项选中状态 */
-    .counter-item.selected {
-      background: #F5DEB3; /* 浅棕色背景 */
-      border-color: #8B4513; /* 深棕色边框 */
-      box-shadow: 0 0 0.6rem rgba(139, 69, 19, 0.5); /* 发光效果：模糊0.6rem */
+      position: relative; /* 相对定位，用于价格标签绝对定位 */
+      cursor: default; /* 默认光标，不可点击 */
     }
 
     /* 面包图标 */
     .counter-item .bread-icon {
-      font-size: 1.6rem; /* 图标大小1.6rem */
+      font-size: 1.25rem; /* 图标大小1.25rem (2.5 / 2) */
     }
 
-    /* 面包价格 */
+    /* 面包价格 - 叠加在右下角 */
     .counter-item .bread-price {
-      font-size: 0.55rem; /* 字体大小0.55rem */
-      color: #8B4513; /* 棕色文字 */
+      position: absolute; /* 绝对定位 */
+      bottom: 0.05rem; /* 距离底部0.05rem */
+      right: 0.05rem; /* 距离右侧0.05rem */
+      background: rgba(139, 69, 19, 0.85); /* 半透明深棕色背景 */
+      color: white; /* 白色文字 */
+      font-size: 0.3rem; /* 字体大小0.3rem (0.6 / 2) */
+      padding: 0.05rem 0.125rem; /* 上下0.05rem，左右0.125rem */
+      border-radius: 0.15rem; /* 圆角0.15rem (0.3 / 2) */
       font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.05rem; /* 图标和数字间距 */
     }
 
     /* 面包数量标签 */
     .counter-item .count {
       position: absolute; /* 绝对定位 */
-      top: 0.06rem; /* 距离顶部0.06rem */
-      right: 0.06rem; /* 距离右侧0.06rem */
+      top: 0.03rem; /* 距离顶部0.03rem (0.06 / 2) */
+      right: 0.03rem; /* 距离右侧0.03rem (0.06 / 2) */
       background: #8B4513; /* 深棕色背景 */
       color: white; /* 白色文字 */
-      font-size: 0.55rem; /* 字体大小0.55rem */
-      padding: 0.06rem 0.25rem; /* 上下0.06rem，左右0.25rem */
-      border-radius: 0.5rem; /* 圆角0.5rem */
+      font-size: 0.275rem; /* 字体大小0.275rem (0.55 / 2) */
+      padding: 0.03rem 0.125rem; /* 上下0.03rem，左右0.125rem */
+      border-radius: 0.25rem; /* 圆角0.25rem (0.5 / 2) */
     }
 
     /* ==================== 售卖区 - 顾客 ==================== */
@@ -1431,16 +1447,16 @@
       .recipe-item {
         padding: 0.35rem; /* 配方项内边距缩小到0.35rem */
         margin-bottom: 0.35rem; /* 配方项底部外边距缩小到0.35rem */
-        gap: 0.35rem; /* 配方项子元素间距缩小到0.35rem */
+        gap: 0.25rem; /* 配方项子元素间距缩小到0.25rem */
       }
       .recipe-ing {
-        font-size: 2.2rem; /* 原料图标缩小到2.2rem */
+        font-size: 1.8rem; /* 原料图标缩小到1.8rem */
       }
       .recipe-arrow {
-        font-size: 1.3rem; /* 箭头缩小到1.3rem */
+        font-size: 1.2rem; /* 箭头缩小到1.2rem */
       }
       .recipe-result {
-        font-size: 2.7rem; /* 结果图标缩小到2.7rem */
+        font-size: 2.2rem; /* 结果图标缩小到2.2rem */
       }
       .recipe-time {
         font-size: 0.65rem; /* 时间文字缩小到0.65rem */
@@ -1468,16 +1484,16 @@
       .recipe-item {
         padding: 0.3rem; /* 配方项内边距缩小到0.3rem */
         margin-bottom: 0.3rem; /* 配方项底部外边距缩小到0.3rem */
-        gap: 0.3rem; /* 配方项子元素间距缩小到0.3rem */
+        gap: 0.2rem; /* 配方项子元素间距缩小到0.2rem */
       }
       .recipe-ing {
-        font-size: 2rem; /* 原料图标缩小到2rem */
+        font-size: 1.6rem; /* 原料图标缩小到1.6rem */
       }
       .recipe-arrow {
-        font-size: 1.2rem; /* 箭头缩小到1.2rem */
+        font-size: 1.1rem; /* 箭头缩小到1.1rem */
       }
       .recipe-result {
-        font-size: 2.5rem; /* 结果图标缩小到2.5rem */
+        font-size: 2rem; /* 结果图标缩小到2rem */
       }
       .recipe-time {
         font-size: 0.6rem; /* 时间文字缩小到0.6rem */
@@ -1505,16 +1521,16 @@
       .recipe-item {
         padding: 0.25rem; /* 配方项内边距缩小到0.25rem */
         margin-bottom: 0.25rem; /* 配方项底部外边距缩小到0.25rem */
-        gap: 0.25rem; /* 配方项子元素间距缩小到0.25rem */
+        gap: 0.18rem; /* 配方项子元素间距缩小到0.18rem */
       }
       .recipe-ing {
-        font-size: 1.8rem; /* 原料图标缩小到1.8rem */
+        font-size: 1.4rem; /* 原料图标缩小到1.4rem */
       }
       .recipe-arrow {
-        font-size: 1.1rem; /* 箭头缩小到1.1rem */
+        font-size: 1rem; /* 箭头缩小到1rem */
       }
       .recipe-result {
-        font-size: 2.3rem; /* 结果图标缩小到2.3rem */
+        font-size: 1.8rem; /* 结果图标缩小到1.8rem */
       }
       .recipe-time {
         font-size: 0.55rem; /* 时间文字缩小到0.55rem */
@@ -1542,16 +1558,16 @@
       .recipe-item {
         padding: 0.2rem; /* 配方项内边距缩小到0.2rem */
         margin-bottom: 0.2rem; /* 配方项底部外边距缩小到0.2rem */
-        gap: 0.2rem; /* 配方项子元素间距缩小到0.2rem */
+        gap: 0.15rem; /* 配方项子元素间距缩小到0.15rem */
       }
       .recipe-ing {
-        font-size: 1.6rem; /* 原料图标缩小到1.6rem */
+        font-size: 1.2rem; /* 原料图标缩小到1.2rem */
       }
       .recipe-arrow {
-        font-size: 1rem; /* 箭头缩小到1rem */
+        font-size: 0.9rem; /* 箭头缩小到0.9rem */
       }
       .recipe-result {
-        font-size: 2.1rem; /* 结果图标缩小到2.1rem */
+        font-size: 1.6rem; /* 结果图标缩小到1.6rem */
       }
       .recipe-time {
         font-size: 0.5rem; /* 时间文字缩小到0.5rem */
@@ -2535,8 +2551,8 @@
 
         // 情况1：空地，显示半透明的种子图标
         if (!crop) {
-        plotEl.innerHTML = '<span style="font-size:1.5rem;opacity:0.3;">🌱</span>';
-        // 字体大小1.5rem，透明度30%
+        plotEl.innerHTML = '<span style="font-size:1.8rem;opacity:0.3;">🌱</span>';
+        // 字体大小1.8rem (1.5 * 1.2)，透明度30%
           return;
         }
 
@@ -2544,8 +2560,8 @@
 
         // 情况2：已收获，显示闪光特效
         if (crop.harvested) {
-          plotEl.innerHTML = '<span style="font-size:1.5rem;opacity:0.3;">✨</span>';
-          // 字体大小1.5rem，透明度30%
+          plotEl.innerHTML = '<span style="font-size:1.8rem;opacity:0.3;">✨</span>';
+          // 字体大小1.8rem (1.5 * 1.2)，透明度30%
         }
         // 情况3：已成熟，显示作物图标和"可收获"提示
         else if (crop.ready) {
