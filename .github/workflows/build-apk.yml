@@ -1,237 +1,105 @@
-name: Build Bakery APK
+name: Build Android APK
 
 on:
-  workflow_dispatch:
   push:
-    branches: [main]
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      - name: Setup Java 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-      
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          api-level: 33
-          build-tools: 33.0.2
-      
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: 8.0
-      
-      - name: Create Android Project Structure
-        run: |
-          mkdir -p BakeryApp/app/src/main/{java/com/bakery,assets,res/mipmap-hdpi}
-          cd BakeryApp
-          
-          # ===== settings.gradle =====
-          cat > settings.gradle << 'EOF'
-          rootProject.name = "BakeryApp"
-          include ':app'
-          EOF
-          
-          # ===== Project 级 build.gradle =====
-          cat > build.gradle << 'EOF'
-          buildscript {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-              dependencies {
-                  classpath 'com.android.tools.build:gradle:8.1.4'
-              }
-          }
-          
-          allprojects {
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
-          
-          tasks.register('clean', Delete) {
-              delete rootProject.buildDir
-          }
-          EOF
-          
-          # ===== App 级 build.gradle =====
-          mkdir -p app
-          cat > app/build.gradle << 'EOF'
-          apply plugin: 'com.android.application'
-          
-          android {
-              namespace 'com.bakery'
-              compileSdk 33
-              
-              defaultConfig {
-                  applicationId "com.bakery"
-                  minSdk 21
-                  targetSdk 33
-                  versionCode 1
-                  versionName "1.0"
-              }
-              
-              buildTypes {
-                  release {
-                      minifyEnabled false
-                      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-                  }
-              }
-              
-              compileOptions {
-                  sourceCompatibility JavaVersion.VERSION_1_8
-                  targetCompatibility JavaVersion.VERSION_1_8
-              }
-          }
-          
-          dependencies {
-              implementation 'androidx.appcompat:appcompat:1.6.1'
-          }
-          EOF
-          
-          # ===== AndroidManifest.xml =====
-          mkdir -p app/src/main
-          cat > app/src/main/AndroidManifest.xml << 'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              
-              <uses-permission android:name="android.permission.INTERNET" />
-              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-              
-              <application 
-                  android:label="面包工坊"
-                  android:icon="@mipmap/ic_launcher"
-                  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-                  android:allowBackup="true"
-                  android:supportsRtl="true">
-                  <activity 
-                      android:name=".MainActivity"
-                      android:exported="true"
-                      android:configChanges="orientation|screenSize|keyboardHidden"
-                      android:screenOrientation="landscape">
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN"/>
-                          <category android:name="android.intent.category.LAUNCHER"/>
-                      </intent-filter>
-                  </activity>
-              </application>
-          </manifest>
-          EOF
-          
-          # ===== MainActivity.java =====
-          mkdir -p app/src/main/java/com/bakery
-          cat > app/src/main/java/com/bakery/MainActivity.java << 'EOF'
-          package com.bakery;
-          
-          import android.app.Activity;
-          import android.os.Bundle;
-          import android.webkit.WebView;
-          import android.webkit.WebSettings;
-          import android.webkit.WebViewClient;
-          import android.view.KeyEvent;
-          
-          public class MainActivity extends Activity {
-              private WebView webView;
-              
-              @Override 
-              protected void onCreate(Bundle savedInstanceState) {
-                  super.onCreate(savedInstanceState);
-                  
-                  webView = new WebView(this);
-                  WebSettings settings = webView.getSettings();
-                  
-                  // 启用 JavaScript
-                  settings.setJavaScriptEnabled(true);
-                  
-                  // 启用本地存储
-                  settings.setDomStorageEnabled(true);
-                  settings.setDatabaseEnabled(true);
-                  
-                  // 启用缓存
-                  settings.setAppCacheEnabled(true);
-                  settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-                  
-                  // 支持缩放
-                  settings.setSupportZoom(false);
-                  settings.setBuiltInZoomControls(false);
-                  
-                  // 自适应屏幕
-                  settings.setUseWideViewPort(true);
-                  settings.setLoadWithOverviewMode(true);
-                  
-                  // 设置 WebViewClient 以在 WebView 内加载链接
-                  webView.setWebViewClient(new WebViewClient());
-                  
-                  // 加载本地 HTML 文件
-                  webView.loadUrl("file:///android_asset/index.html");
-                  
-                  setContentView(webView);
-              }
-              
-              // 处理返回键
-              @Override
-              public boolean onKeyDown(int keyCode, KeyEvent event) {
-                  if (keyCode == KeyEvent.KEYCODE_BACK && webView.canGoBack()) {
-                      webView.goBack();
-                      return true;
-                  }
-                  return super.onKeyDown(keyCode, event);
-              }
-          }
-          EOF
-          
-          # ===== 创建简单的应用图标 =====
-          # 使用 base64 编码的简单 PNG 图标（48x48 像素的面包图标占位符）
-          mkdir -p app/src/main/res/mipmap-hdpi
-          echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" | base64 -d > app/src/main/res/mipmap-hdpi/ic_launcher.png || echo "Icon creation skipped"
-      
-      - name: Copy HTML to Assets
-        run: |
-          cp $GITHUB_WORKSPACE/index.html BakeryApp/app/src/main/assets/index.html
-          ls -lh BakeryApp/app/src/main/assets/
-      
-      - name: Initialize Gradle Wrapper
-        working-directory: BakeryApp
-        run: |
-          gradle wrapper --gradle-version 8.0
-          chmod +x ./gradlew
-      
-      - name: Build Debug APK
-        working-directory: BakeryApp
-        run: |
-          ./gradlew assembleDebug --no-daemon --stacktrace --info
-      
-      - name: List Build Outputs
-        if: always()
-        working-directory: BakeryApp
-        run: |
-          echo "=== Build outputs ==="
-          find app/build/outputs -type f -name "*.apk" || echo "No APK files found"
-      
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: 面包工坊-APK-${{ github.run_number }}
-          path: BakeryApp/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
-          retention-days: 30
-      
-      - name: Upload Build Logs (if failed)
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-logs-${{ github.run_number }}
-          path: BakeryApp/app/build/outputs/logs/
-          if-no-files-found: ignore
-          retention-days: 7
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Install Cordova
+      run: |
+        npm install -g cordova@12
+
+    - name: Create Cordova project structure
+      run: |
+        # 创建必要的目录结构
+        mkdir -p www
+        mkdir -p platforms
+        mkdir -p plugins
+
+        # 复制 HTML 文件到 www 目录
+        cp index_save.html www/
+
+        # 如果有其他资源文件也复制过去
+        if [ -f "index.html" ]; then
+          cp index.html www/
+        fi
+
+        # 创建默认图标（如果不存在）
+        if [ ! -f "icon.png" ]; then
+          # 创建一个简单的 1x1 透明 PNG 作为占位符
+          echo "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" | base64 -d > icon.png
+        fi
+        cp icon.png www/ 2>/dev/null || true
+
+    - name: Add Android platform
+      run: |
+        cordova platform add android@12.0.0
+
+    - name: Build APK
+      run: |
+        cordova build android --release -- --packageType=apk
+
+    - name: Find APK file
+      id: find_apk
+      run: |
+        APK_PATH=$(find platforms/android/app/build/outputs/apk/release -name "*.apk" | head -n 1)
+        echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+        echo "Found APK at: $APK_PATH"
+
+    - name: Rename APK
+      run: |
+        APK_PATH="${{ steps.find_apk.outputs.apk_path }}"
+        if [ -f "$APK_PATH" ]; then
+          cp "$APK_PATH" bakery-builder-v1.0.0.apk
+          ls -lh bakery-builder-v1.0.0.apk
+        fi
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: bakery-builder-apk
+        path: bakery-builder-v1.0.0.apk
+
+    - name: Create Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v1.0.0-${{ github.run_number }}
+        name: Release v1.0.0-${{ github.run_number }}
+        body: |
+          ## 面包工坊极速版 APK
+
+          自动构建的 Android APK 文件
+
+          ### 安装说明
+          1. 下载 APK 文件
+          2. 在 Android 设备上启用"未知来源"安装
+          3. 安装 APK
+
+          构建时间: ${{ github.event.head_commit.timestamp }}
+        files: bakery-builder-v1.0.0.apk
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

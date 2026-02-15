@@ -1,0 +1,24 @@
+{
+  "name": "bakery-builder",
+  "version": "1.0.0",
+  "description": "面包工坊极速版 - 一个有趣的面包烘焙经营游戏",
+  "main": "index_save.html",
+  "scripts": {
+    "build": "cordova build android --release"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cuihf06-Private/bakery-builder.git"
+  },
+  "author": "cuihf06-Private <cuihf06@gmail.com>",
+  "license": "MIT",
+  "cordova": {
+    "platforms": [
+      "android"
+    ]
+  },
+  "devDependencies": {
+    "cordova": "^12.0.0",
+    "cordova-android": "^12.0.0"
+  }
+}
