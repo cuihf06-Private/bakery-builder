@@ -91,25 +91,25 @@
     #game {
       display: flex;
       height: 92vh; /* 占视口高度的92%（100% - 顶栏8%） */
-      padding: 0.6rem; /* 内边距0.6rem */
-      gap: 0.6rem; /* 四个区域之间的间距0.6rem */
+      padding: 0.2rem; /* 内边距0.2rem */
+      gap: 0.2rem; /* 四个区域之间的间距0.2rem */
       flex-wrap: nowrap; /* 不换行 */
       overflow: hidden; /* 隐藏溢出 */
       flex-shrink: 0; /* 不允许压缩 */
     }
 
     /* ==================== 四栏布局 ==================== */
-    /* 农田区、制作区、材料区、售卖区 - 横向各占25% */
+    /* 农田区、制作区、材料区、售卖区 - 横向各占24.5% */
     .field, .kitchen, .market, .shop {
       background: rgba(255, 255, 255, 0.9); /* 半透明白色背景 */
-      border-radius: 0.9rem; /* 圆角0.9rem */
-      padding: 0.9rem; /* 内边距0.9rem */
+      border-radius: 0.4rem; /* 圆角0.4rem */
+      padding: 0.4rem; /* 内边距0.4rem */
       box-shadow: 0 0.25rem 0.9rem rgba(0,0,0,0.1); /* 阴影：垂直偏移0.25rem，模糊0.9rem */
       overflow-y: auto; /* 纵向滚动 */
       overflow-x: hidden; /* 横向隐藏溢出 */
-      width: 25%; /* 宽度占25% */
-      min-width: 25%; /* 最小宽度25%，防止压缩 */
-      max-width: 25%; /* 最大宽度25%，防止拉伸 */
+      width: 24.5%; /* 宽度占24.5% */
+      min-width: 24.5%; /* 最小宽度24.5%，防止压缩 */
+      max-width: 24.5%; /* 最大宽度24.5%，防止拉伸 */
       height: 100%; /* 高度占满父容器 */
       display: flex;
       flex-direction: column; /* 垂直排列子元素 */
@@ -118,14 +118,14 @@
     /* 屏幕高度<800px时，减小四栏内边距 */
     @media (max-height: 800px) {
       .field, .kitchen, .market, .shop {
-        padding: 0.7rem; /* 内边距缩小到0.7rem */
+        padding: 0.3rem; /* 内边距缩小到0.3rem */
       }
     }
 
     /* 屏幕高度<600px时，进一步减小四栏内边距 */
     @media (max-height: 600px) {
       .field, .kitchen, .market, .shop {
-        padding: 0.5rem; /* 内边距缩小到0.5rem */
+        padding: 0.25rem; /* 内边距缩小到0.25rem */
       }
     }
 
@@ -1044,12 +1044,12 @@
     .customer {
       display: flex;
       align-items: center; /* 垂直居中 */
-      gap: 0.5rem; /* 子元素间距0.5rem */
-      padding: 0.5rem; /* 内边距0.5rem */
-      margin-bottom: 0.5rem; /* 底部外边距0.5rem */
+      gap: 0.25rem; /* 子元素间距0.25rem (0.5 / 2) */
+      padding: 0.25rem; /* 内边距0.25rem (0.5 / 2) */
+      margin-bottom: 0.25rem; /* 底部外边距0.25rem (0.5 / 2) */
       background: white; /* 白色背景 */
-      border-radius: 0.6rem; /* 圆角0.6rem */
-      border: 0.12rem solid #DEB887; /* 边框宽度0.12rem */
+      border-radius: 0.3rem; /* 圆角0.3rem (0.6 / 2) */
+      border: 0.06rem solid #DEB887; /* 边框宽度0.06rem (0.12 / 2) */
       animation: slideIn 0.5s ease; /* 滑入动画，持续0.5秒 */
     }
 
@@ -1061,9 +1061,9 @@
 
     /* 顾客头像 */
     .customer-avatar {
-      font-size: 2rem; /* 图标大小2rem */
-      width: 2.5rem; /* 宽度2.5rem */
-      height: 2.5rem; /* 高度2.5rem */
+      font-size: 1rem; /* 图标大小1rem (2 / 2) */
+      width: 1.25rem; /* 宽度1.25rem (2.5 / 2) */
+      height: 1.25rem; /* 高度1.25rem (2.5 / 2) */
       display: flex;
       align-items: center; /* 垂直居中 */
       justify-content: center; /* 水平居中 */
@@ -1080,32 +1080,32 @@
     .customer-name {
       font-weight: bold;
       color: #8B4513; /* 棕色文字 */
-      font-size: 0.75rem; /* 字体大小0.75rem */
+      font-size: 0.6rem; /* 字体大小0.6rem */
     }
 
     /* 顾客需求 */
     .customer-want {
-      font-size: 0.7rem; /* 字体大小0.7rem */
+      font-size: 0.55rem; /* 字体大小0.55rem */
       color: #666; /* 灰色文字 */
       display: flex;
       align-items: center; /* 垂直居中 */
-      gap: 0.18rem; /* 子元素间距0.18rem */
+      gap: 0.09rem; /* 子元素间距0.09rem (0.18 / 2) */
     }
 
     /* 顾客需求图标 */
     .customer-want-emoji {
-      font-size: 1.1rem; /* 图标大小1.1rem */
+      font-size: 0.8rem; /* 图标大小0.8rem */
     }
 
     /* 顾客出售按钮 */
     .customer-btn {
-      padding: 0.4rem 0.75rem; /* 上下0.4rem，左右0.75rem */
+      padding: 0.2rem 0.375rem; /* 上下0.2rem，左右0.375rem (0.4 / 2, 0.75 / 2) */
       background: #90EE90; /* 浅绿色背景 */
       border: none; /* 无边框 */
-      border-radius: 0.9rem; /* 圆角0.9rem */
+      border-radius: 0.45rem; /* 圆角0.45rem (0.9 / 2) */
       cursor: pointer; /* 鼠标指针 */
       font-weight: bold;
-      font-size: 0.75rem; /* 字体大小0.75rem */
+      font-size: 0.55rem; /* 字体大小0.55rem */
       color: #2E8B57; /* 深绿色文字 */
       transition: all 0.3s; /* 过渡动画0.3秒 */
     }
