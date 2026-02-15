@@ -5,1197 +5,1559 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🍞 面包工坊极速版</title>
   <style>
+    /* ==================== 全局重置 ==================== */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    /* 响应式根字体大小 - 基于视口宽度 */
+    /* ==================== 响应式根字体大小 ==================== */
+    /* 基于视口宽度动态调整字体大小 */
     html {
-      font-size: calc(14px + 0.4vw);
-      height: 100vh;
-      overflow: hidden;
+      font-size: calc(14px + 0.4vw); /* 基础字体：14px + 视口宽度的0.4% */
+      height: 100vh; /* 占满整个视口高度 */
+      overflow: hidden; /* 禁止页面滚动 */
     }
 
+    /* 小屏幕（宽度<768px）字体调整 */
     @media (max-width: 768px) {
       html {
-        font-size: calc(12px + 0.5vw);
+        font-size: calc(12px + 0.5vw); /* 小屏基础字体：12px + 视口宽度的0.5% */
       }
     }
 
+    /* 大屏幕（宽度>=1920px）字体固定 */
     @media (min-width: 1920px) {
       html {
-        font-size: 20px;
+        font-size: 20px; /* 大屏固定字体大小 */
       }
     }
 
+    /* ==================== 页面主体 ==================== */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #F5DEB3 0%, #DEB887 100%);
-      height: 100vh;
-      overflow: hidden;
+      background: linear-gradient(135deg, #F5DEB3 0%, #DEB887 100%); /* 渐变背景色 */
+      height: 100vh; /* 占满整个视口高度 */
+      overflow: hidden; /* 禁止页面滚动 */
       display: flex;
-      flex-direction: column;
-    }
-    
-    /* 顶部状态栏 - 固定占屏幕8% */
-    .header {
-      background: #8B4513;
-      color: white;
-      height: 8vh;
-      min-height: 8vh;
-      max-height: 8vh;
-      padding: 0 1.2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 0.12rem 0.6rem rgba(0,0,0,0.3);
-      flex-wrap: nowrap;
-      gap: 0.5rem;
-      flex-shrink: 0;
+      flex-direction: column; /* 垂直排列：顶栏 + 游戏区 */
     }
 
+    /* ==================== 顶部状态栏 ==================== */
+    /* 固定占屏幕纵向8%高度 */
+    .header {
+      background: #8B4513; /* 棕色背景 */
+      color: white;
+      height: 8vh; /* 占视口高度的8% */
+      min-height: 8vh; /* 最小高度8vh，防止压缩 */
+      max-height: 8vh; /* 最大高度8vh，防止拉伸 */
+      padding: 0 1.2rem; /* 左右内边距1.2rem */
+      display: flex;
+      justify-content: space-between; /* 子元素两端对齐 */
+      align-items: center; /* 子元素垂直居中 */
+      box-shadow: 0 0.12rem 0.6rem rgba(0,0,0,0.3); /* 底部阴影：垂直偏移0.12rem，模糊0.6rem */
+      flex-wrap: nowrap; /* 不换行 */
+      gap: 0.5rem; /* 子元素间距0.5rem */
+      flex-shrink: 0; /* 不允许压缩 */
+    }
+
+    /* 顶栏中的单个项目（金币、局数等） */
     .header-item {
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.9rem;
+      align-items: center; /* 垂直居中 */
+      gap: 0.5rem; /* 图标与文字间距0.5rem */
+      font-size: 0.9rem; /* 文字大小0.9rem */
       font-weight: bold;
-      white-space: nowrap;
+      white-space: nowrap; /* 不换行 */
     }
 
+    /* 顶栏项目中的图标 */
     .header-item span {
-      font-size: 1.2rem;
+      font-size: 1.2rem; /* 图标大小1.2rem */
     }
 
+    /* 计时器样式 */
     .timer {
-      background: #D2691E;
-      padding: 0.3rem 0.9rem;
-      border-radius: 1.2rem;
-      font-size: 1rem;
-      white-space: nowrap;
+      background: #D2691E; /* 深橙色背景 */
+      padding: 0.3rem 0.9rem; /* 上下0.3rem，左右0.9rem */
+      border-radius: 1.2rem; /* 圆角1.2rem */
+      font-size: 1rem; /* 字体大小1rem */
+      white-space: nowrap; /* 不换行 */
     }
 
-    /* 主游戏区 - 占据剩余92%高度 */
+    /* ==================== 主游戏区 ==================== */
+    /* 占据剩余92%高度 */
     #game {
       display: flex;
-      height: 92vh;
-      padding: 0.6rem;
-      gap: 0.6rem;
-      flex-wrap: nowrap;
-      overflow: hidden;
-      flex-shrink: 0;
+      height: 92vh; /* 占视口高度的92%（100% - 顶栏8%） */
+      padding: 0.6rem; /* 内边距0.6rem */
+      gap: 0.6rem; /* 四个区域之间的间距0.6rem */
+      flex-wrap: nowrap; /* 不换行 */
+      overflow: hidden; /* 隐藏溢出 */
+      flex-shrink: 0; /* 不允许压缩 */
     }
 
-    /* 四栏布局 - 横向各占25% */
+    /* ==================== 四栏布局 ==================== */
+    /* 农田区、制作区、材料区、售卖区 - 横向各占25% */
     .field, .kitchen, .market, .shop {
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 0.9rem;
-      padding: 0.9rem;
-      box-shadow: 0 0.25rem 0.9rem rgba(0,0,0,0.1);
-      overflow-y: auto;
-      overflow-x: hidden;
-      width: 25%;
-      min-width: 25%;
-      max-width: 25%;
-      height: 100%;
+      background: rgba(255, 255, 255, 0.9); /* 半透明白色背景 */
+      border-radius: 0.9rem; /* 圆角0.9rem */
+      padding: 0.9rem; /* 内边距0.9rem */
+      box-shadow: 0 0.25rem 0.9rem rgba(0,0,0,0.1); /* 阴影：垂直偏移0.25rem，模糊0.9rem */
+      overflow-y: auto; /* 纵向滚动 */
+      overflow-x: hidden; /* 横向隐藏溢出 */
+      width: 25%; /* 宽度占25% */
+      min-width: 25%; /* 最小宽度25%，防止压缩 */
+      max-width: 25%; /* 最大宽度25%，防止拉伸 */
+      height: 100%; /* 高度占满父容器 */
       display: flex;
-      flex-direction: column;
+      flex-direction: column; /* 垂直排列子元素 */
     }
 
+    /* 屏幕高度<800px时，减小四栏内边距 */
     @media (max-height: 800px) {
       .field, .kitchen, .market, .shop {
-        padding: 0.7rem;
+        padding: 0.7rem; /* 内边距缩小到0.7rem */
       }
     }
 
+    /* 屏幕高度<600px时，进一步减小四栏内边距 */
     @media (max-height: 600px) {
       .field, .kitchen, .market, .shop {
-        padding: 0.5rem;
+        padding: 0.5rem; /* 内边距缩小到0.5rem */
       }
     }
 
+    /* ==================== 区域标题 ==================== */
+    /* 每个区域的标题（"农田区"、"制作区"等） - 占本区域纵向6% */
     .section-title {
-      text-align: center;
-      font-size: 1.1rem;
+      text-align: center; /* 文字居中 */
+      font-size: 1.1rem; /* 字体大小1.1rem */
       font-weight: bold;
-      color: #8B4513;
-      margin-bottom: 0.5rem;
-      padding-bottom: 0.3rem;
-      border-bottom: 0.12rem solid #DEB887;
-      height: 6%;
-      min-height: 6%;
-      max-height: 6%;
-      flex-shrink: 0;
+      color: #8B4513; /* 棕色文字 */
+      margin-bottom: 0.5rem; /* 底部外边距0.5rem */
+      padding-bottom: 0.3rem; /* 底部内边距0.3rem */
+      border-bottom: 0.12rem solid #DEB887; /* 底部边框：宽度0.12rem */
+      height: 6%; /* 占父容器高度的6% */
+      min-height: 6%; /* 最小高度6%，防止压缩 */
+      max-height: 6%; /* 最大高度6%，防止拉伸 */
+      flex-shrink: 0; /* 不允许压缩 */
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: center; /* 垂直居中 */
+      justify-content: center; /* 水平居中 */
     }
 
+    /* 屏幕高度<800px时，缩小标题 */
     @media (max-height: 800px) {
       .section-title {
-        font-size: 1rem;
-        margin-bottom: 0.3rem;
-        padding-bottom: 0.2rem;
+        font-size: 1rem; /* 字体缩小到1rem */
+        margin-bottom: 0.3rem; /* 底部外边距缩小到0.3rem */
+        padding-bottom: 0.2rem; /* 底部内边距缩小到0.2rem */
       }
     }
 
+    /* 屏幕高度<600px时，进一步缩小标题 */
     @media (max-height: 600px) {
       .section-title {
-        font-size: 0.9rem;
-        margin-bottom: 0.2rem;
-        padding-bottom: 0.15rem;
+        font-size: 0.9rem; /* 字体缩小到0.9rem */
+        margin-bottom: 0.2rem; /* 底部外边距缩小到0.2rem */
+        padding-bottom: 0.15rem; /* 底部内边距缩小到0.15rem */
       }
     }
 
-    /* 农田区 */
+    /* ==================== 农田区 ==================== */
     .field {
-      gap: 0.3rem;
+      gap: 0.3rem; /* 农田区子元素之间的间距0.3rem */
     }
 
+    /* 屏幕高度<800px时，缩小农田区间距 */
     @media (max-height: 800px) {
       .field {
-        gap: 0.2rem;
+        gap: 0.2rem; /* 间距缩小到0.2rem */
       }
     }
 
+    /* 屏幕高度<600px时，进一步缩小农田区间距 */
     @media (max-height: 600px) {
       .field {
-        gap: 0.15rem;
+        gap: 0.15rem; /* 间距缩小到0.15rem */
       }
     }
 
+    /* ==================== 种子选择栏 ==================== */
+    /* 2x2网格布局：小麦/奶牛一行，甘蔗/母鸡一行 */
     .seeds-bar {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      grid-template-rows: repeat(2, 1fr);
-      gap: 0.4rem;
-      margin-bottom: 0.3rem;
-      padding: 0.5rem;
-      background: #FFF8DC;
-      border-radius: 0.6rem;
-      flex-shrink: 0;
+      grid-template-columns: repeat(2, 1fr); /* 2列，每列等宽 */
+      grid-template-rows: repeat(2, 1fr); /* 2行，每行等高 */
+      gap: 0.4rem; /* 网格间距0.4rem */
+      margin-bottom: 0.3rem; /* 底部外边距0.3rem */
+      padding: 0.5rem; /* 内边距0.5rem */
+      background: #FFF8DC; /* 浅黄色背景 */
+      border-radius: 0.6rem; /* 圆角0.6rem */
+      flex-shrink: 0; /* 不允许压缩 */
     }
 
+    /* 屏幕高度<800px时，缩小种子栏 */
     @media (max-height: 800px) {
       .seeds-bar {
-        margin-bottom: 0.2rem;
-        padding: 0.4rem;
-        gap: 0.3rem;
+        margin-bottom: 0.2rem; /* 底部外边距缩小到0.2rem */
+        padding: 0.4rem; /* 内边距缩小到0.4rem */
+        gap: 0.3rem; /* 网格间距缩小到0.3rem */
       }
     }
 
+    /* 屏幕高度<600px时，进一步缩小种子栏 */
     @media (max-height: 600px) {
       .seeds-bar {
-        margin-bottom: 0.15rem;
-        padding: 0.3rem;
-        gap: 0.2rem;
+        margin-bottom: 0.15rem; /* 底部外边距缩小到0.15rem */
+        padding: 0.3rem; /* 内边距缩小到0.3rem */
+        gap: 0.2rem; /* 网格间距缩小到0.2rem */
       }
     }
 
+    /* ==================== 单个种子项 ==================== */
     .seed-item {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.25rem;
-      padding: 0.3rem 0.4rem;
-      background: white;
-      border-radius: 1.2rem;
-      border: 0.12rem solid #DEB887;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-size: 0.75rem;
-      white-space: nowrap;
-      overflow: hidden;
+      align-items: center; /* 垂直居中 */
+      justify-content: center; /* 水平居中 */
+      gap: 0.25rem; /* 图标与文字间距0.25rem */
+      padding: 0.3rem 0.4rem; /* 上下0.3rem，左右0.4rem */
+      background: white; /* 白色背景 */
+      border-radius: 1.2rem; /* 圆角1.2rem */
+      border: 0.12rem solid #DEB887; /* 边框宽度0.12rem */
+      cursor: pointer; /* 鼠标指针 */
+      transition: all 0.3s; /* 过渡动画0.3秒 */
+      font-size: 0.75rem; /* 字体大小0.75rem */
+      white-space: nowrap; /* 不换行 */
+      overflow: hidden; /* 隐藏溢出 */
     }
 
+    /* 屏幕高度<800px时，缩小种子项 */
     @media (max-height: 800px) {
       .seed-item {
-        padding: 0.25rem 0.35rem;
-        font-size: 0.7rem;
-        gap: 0.2rem;
+        padding: 0.25rem 0.35rem; /* 上下0.25rem，左右0.35rem */
+        font-size: 0.7rem; /* 字体缩小到0.7rem */
+        gap: 0.2rem; /* 间距缩小到0.2rem */
       }
     }
 
+    /* 屏幕高度<600px时，进一步缩小种子项 */
     @media (max-height: 600px) {
       .seed-item {
-        padding: 0.2rem 0.3rem;
-        font-size: 0.65rem;
-        gap: 0.15rem;
+        padding: 0.2rem 0.3rem; /* 上下0.2rem，左右0.3rem */
+        font-size: 0.65rem; /* 字体缩小到0.65rem */
+        gap: 0.15rem; /* 间距缩小到0.15rem */
       }
     }
 
     .seed-item span {
-      flex-shrink: 0;
+      flex-shrink: 0; /* 不允许压缩 */
     }
 
+    /* ==================== 种子项网格定位 ==================== */
+    /* 第1个种子（小麦）：第1列第1行 */
     .seed-item:nth-child(1) {
       grid-column: 1;
       grid-row: 1;
     }
 
+    /* 第2个种子（奶牛）：第2列第1行 */
     .seed-item:nth-child(2) {
       grid-column: 2;
       grid-row: 1;
     }
 
+    /* 第3个种子（甘蔗）：第1列第2行 */
     .seed-item:nth-child(3) {
       grid-column: 1;
       grid-row: 2;
     }
 
+    /* 第4个种子（母鸡）：第2列第2行 */
     .seed-item:nth-child(4) {
       grid-column: 2;
       grid-row: 2;
     }
 
+    /* ==================== 种子项交互状态 ==================== */
+    /* 鼠标悬停效果 */
     .seed-item:hover {
-      transform: scale(1.05);
-      border-color: #8B4513;
+      transform: scale(1.05); /* 放大到105% */
+      border-color: #8B4513; /* 边框变为深棕色 */
     }
 
+    /* 锁定状态（未解锁的种子） */
     .seed-item.locked {
-      opacity: 0.5;
-      cursor: not-allowed;
+      opacity: 0.5; /* 半透明 */
+      cursor: not-allowed; /* 禁止光标 */
     }
 
+    /* 选中状态 */
     .seed-item.selected {
-      background: #F5DEB3;
-      border-color: #8B4513;
-      box-shadow: 0 0 0.5rem rgba(139, 69, 19, 0.4);
+      background: #F5DEB3; /* 浅棕色背景 */
+      border-color: #8B4513; /* 深棕色边框 */
+      box-shadow: 0 0 0.5rem rgba(139, 69, 19, 0.4); /* 发光效果：模糊0.5rem */
     }
 
+    /* "无限"标记 */
     .seed-item .unlimited {
-      font-size: 0.6rem;
-      color: #2E8B57;
+      font-size: 0.6rem; /* 字体大小0.6rem */
+      color: #2E8B57; /* 绿色文字 */
       font-weight: bold;
-      flex-shrink: 0;
+      flex-shrink: 0; /* 不允许压缩 */
     }
 
+    /* ==================== 农田九宫格 ==================== */
+    /* 3x3网格布局，保持正方形 */
     .farm-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      gap: 0.5rem;
-      flex: 0 1 auto;
-      align-content: start;
-      justify-content: center;
-      min-height: 0;
-      width: 100%;
-      aspect-ratio: 1;
-      max-width: 100%;
-      margin: 0 auto;
+      grid-template-columns: repeat(3, 1fr); /* 3列，每列等宽 */
+      grid-template-rows: repeat(3, 1fr); /* 3行，每行等高 */
+      gap: 0.5rem; /* 网格间距0.5rem */
+      flex: 0 1 auto; /* 允许缩小但不放大 */
+      align-content: start; /* 内容顶部对齐 */
+      justify-content: center; /* 内容水平居中 */
+      min-height: 0; /* 最小高度0，允许完全压缩 */
+      width: 100%; /* 宽度占满父容器 */
+      aspect-ratio: 1; /* 宽高比1:1，保持正方形 */
+      max-width: 100%; /* 最大宽度100% */
+      margin: 0 auto; /* 水平居中 */
     }
 
+    /* 屏幕高度<800px时，缩小九宫格间距 */
     @media (max-height: 800px) {
       .farm-grid {
-        gap: 0.4rem;
+        gap: 0.4rem; /* 间距缩小到0.4rem */
       }
     }
 
+    /* 屏幕高度<700px时，进一步缩小九宫格间距 */
     @media (max-height: 700px) {
       .farm-grid {
-        gap: 0.35rem;
+        gap: 0.35rem; /* 间距缩小到0.35rem */
       }
     }
 
+    /* 屏幕高度<600px时，继续缩小九宫格间距 */
     @media (max-height: 600px) {
       .farm-grid {
-        gap: 0.3rem;
+        gap: 0.3rem; /* 间距缩小到0.3rem */
       }
     }
 
+    /* 屏幕高度<500px时，最小九宫格间距 */
     @media (max-height: 500px) {
       .farm-grid {
-        gap: 0.25rem;
+        gap: 0.25rem; /* 间距缩小到0.25rem */
       }
     }
 
+    /* ==================== 单个农田格子 ==================== */
     .farm-plot {
-      aspect-ratio: 1;
-      background: #D2691E;
-      border-radius: 0.6rem;
+      aspect-ratio: 1; /* 宽高比1:1，保持正方形 */
+      background: #D2691E; /* 深橙色背景（空地） */
+      border-radius: 0.6rem; /* 圆角0.6rem */
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s;
-      border: 0.18rem solid transparent;
-      position: relative;
-      overflow: hidden;
-      min-height: 0;
-      min-width: 0;
-      width: 100%;
-      height: 100%;
+      flex-direction: column; /* 垂直排列子元素 */
+      align-items: center; /* 水平居中 */
+      justify-content: center; /* 垂直居中 */
+      cursor: pointer; /* 鼠标指针 */
+      transition: all 0.3s; /* 过渡动画0.3秒 */
+      border: 0.18rem solid transparent; /* 透明边框，宽度0.18rem */
+      position: relative; /* 相对定位，用于子元素绝对定位 */
+      overflow: hidden; /* 隐藏溢出 */
+      min-height: 0; /* 最小高度0，允许完全压缩 */
+      min-width: 0; /* 最小宽度0，允许完全压缩 */
+      width: 100%; /* 宽度占满父容器 */
+      height: 100%; /* 高度占满父容器 */
     }
 
+    /* 屏幕高度<800px时，缩小农田格子 */
     @media (max-height: 800px) {
       .farm-plot {
-        border-radius: 0.5rem;
-        border-width: 0.15rem;
+        border-radius: 0.5rem; /* 圆角缩小到0.5rem */
+        border-width: 0.15rem; /* 边框宽度缩小到0.15rem */
       }
     }
 
+    /* 屏幕高度<700px时，进一步缩小农田格子 */
     @media (max-height: 700px) {
       .farm-plot {
-        border-radius: 0.45rem;
-        border-width: 0.14rem;
+        border-radius: 0.45rem; /* 圆角缩小到0.45rem */
+        border-width: 0.14rem; /* 边框宽度缩小到0.14rem */
       }
     }
 
+    /* 屏幕高度<600px时，继续缩小农田格子 */
     @media (max-height: 600px) {
       .farm-plot {
-        border-radius: 0.4rem;
-        border-width: 0.12rem;
+        border-radius: 0.4rem; /* 圆角缩小到0.4rem */
+        border-width: 0.12rem; /* 边框宽度缩小到0.12rem */
       }
     }
 
+    /* 屏幕高度<500px时，最小农田格子 */
     @media (max-height: 500px) {
       .farm-plot {
-        border-radius: 0.35rem;
-        border-width: 0.1rem;
+        border-radius: 0.35rem; /* 圆角缩小到0.35rem */
+        border-width: 0.1rem; /* 边框宽度缩小到0.1rem */
       }
     }
 
+    /* ==================== 农田格子交互状态 ==================== */
+    /* 鼠标悬停效果 */
     .farm-plot:hover {
-      transform: scale(1.02);
-      border-color: #8B4513;
+      transform: scale(1.02); /* 放大到102% */
+      border-color: #8B4513; /* 边框变为深棕色 */
     }
 
+    /* 已种植状态 */
     .farm-plot.planted {
-      background: #8B4513;
+      background: #8B4513; /* 深棕色背景 */
     }
 
+    /* 成熟可收获状态 */
     .farm-plot.ready {
-      animation: blink 1s infinite;
-      border-color: #FFD700;
+      animation: blink 1s infinite; /* 闪烁动画，1秒循环 */
+      border-color: #FFD700; /* 金色边框 */
     }
 
+    /* 闪烁动画定义 */
     @keyframes blink {
-      0%, 100% { box-shadow: 0 0 0.6rem #FFD700; }
-      50% { box-shadow: 0 0 1.5rem #FFD700; }
+      0%, 100% { box-shadow: 0 0 0.6rem #FFD700; } /* 开始和结束：发光0.6rem */
+      50% { box-shadow: 0 0 1.5rem #FFD700; } /* 中间：发光1.5rem */
     }
 
+    /* ==================== 作物图标 ==================== */
     .crop-icon {
-      font-size: 1.8rem;
-      margin-bottom: 0.2rem;
+      font-size: 1.8rem; /* 图标大小1.8rem */
+      margin-bottom: 0.2rem; /* 底部外边距0.2rem */
     }
 
+    /* 屏幕高度<800px时，缩小作物图标 */
     @media (max-height: 800px) {
       .crop-icon {
-        font-size: 1.5rem;
-        margin-bottom: 0.15rem;
+        font-size: 1.5rem; /* 图标缩小到1.5rem */
+        margin-bottom: 0.15rem; /* 底部外边距缩小到0.15rem */
       }
     }
 
+    /* 屏幕高度<700px时，进一步缩小作物图标 */
     @media (max-height: 700px) {
       .crop-icon {
-        font-size: 1.35rem;
-        margin-bottom: 0.12rem;
+        font-size: 1.35rem; /* 图标缩小到1.35rem */
+        margin-bottom: 0.12rem; /* 底部外边距缩小到0.12rem */
       }
     }
 
+    /* 屏幕高度<600px时，继续缩小作物图标 */
     @media (max-height: 600px) {
       .crop-icon {
-        font-size: 1.2rem;
-        margin-bottom: 0.1rem;
+        font-size: 1.2rem; /* 图标缩小到1.2rem */
+        margin-bottom: 0.1rem; /* 底部外边距缩小到0.1rem */
       }
     }
 
+    /* 屏幕高度<500px时，最小作物图标 */
     @media (max-height: 500px) {
       .crop-icon {
-        font-size: 1rem;
-        margin-bottom: 0.08rem;
+        font-size: 1rem; /* 图标缩小到1rem */
+        margin-bottom: 0.08rem; /* 底部外边距缩小到0.08rem */
       }
     }
 
+    /* ==================== 生长进度条 ==================== */
     .progress-bar {
-      width: 80%;
-      height: 0.3rem;
-      background: rgba(255,255,255,0.3);
-      border-radius: 0.18rem;
-      overflow: hidden;
+      width: 80%; /* 宽度占格子的80% */
+      height: 0.3rem; /* 高度0.3rem */
+      background: rgba(255,255,255,0.3); /* 半透明白色背景 */
+      border-radius: 0.18rem; /* 圆角0.18rem */
+      overflow: hidden; /* 隐藏溢出 */
     }
 
+    /* 屏幕高度<700px时，缩小进度条 */
     @media (max-height: 700px) {
       .progress-bar {
-        height: 0.25rem;
-        width: 75%;
+        height: 0.25rem; /* 高度缩小到0.25rem */
+        width: 75%; /* 宽度缩小到75% */
       }
     }
 
+    /* 屏幕高度<500px时，最小进度条 */
     @media (max-height: 500px) {
       .progress-bar {
-        height: 0.2rem;
-        width: 70%;
+        height: 0.2rem; /* 高度缩小到0.2rem */
+        width: 70%; /* 宽度缩小到70% */
       }
     }
 
+    /* 进度条填充部分 */
     .progress-fill {
-      height: 100%;
-      background: #90EE90;
-      border-radius: 0.18rem;
-      transition: width 0.3s;
+      height: 100%; /* 高度占满进度条 */
+      background: #90EE90; /* 浅绿色 */
+      border-radius: 0.18rem; /* 圆角0.18rem */
+      transition: width 0.3s; /* 宽度变化过渡0.3秒 */
     }
 
+    /* ==================== 格子状态文字 ==================== */
     .plot-status {
-      font-size: 0.6rem;
-      color: white;
-      margin-top: 0.12rem;
+      font-size: 0.6rem; /* 字体大小0.6rem */
+      color: white; /* 白色文字 */
+      margin-top: 0.12rem; /* 顶部外边距0.12rem */
     }
 
+    /* 屏幕高度<800px时，缩小状态文字 */
     @media (max-height: 800px) {
       .plot-status {
-        font-size: 0.55rem;
-        margin-top: 0.1rem;
+        font-size: 0.55rem; /* 字体缩小到0.55rem */
+        margin-top: 0.1rem; /* 顶部外边距缩小到0.1rem */
       }
     }
 
+    /* 屏幕高度<700px时，进一步缩小状态文字 */
     @media (max-height: 700px) {
       .plot-status {
-        font-size: 0.52rem;
-        margin-top: 0.09rem;
+        font-size: 0.52rem; /* 字体缩小到0.52rem */
+        margin-top: 0.09rem; /* 顶部外边距缩小到0.09rem */
       }
     }
 
+    /* 屏幕高度<600px时，继续缩小状态文字 */
     @media (max-height: 600px) {
       .plot-status {
-        font-size: 0.5rem;
-        margin-top: 0.08rem;
+        font-size: 0.5rem; /* 字体缩小到0.5rem */
+        margin-top: 0.08rem; /* 顶部外边距缩小到0.08rem */
       }
     }
 
+    /* 屏幕高度<500px时，最小状态文字 */
     @media (max-height: 500px) {
       .plot-status {
-        font-size: 0.45rem;
-        margin-top: 0.06rem;
+        font-size: 0.45rem; /* 字体缩小到0.45rem */
+        margin-top: 0.06rem; /* 顶部外边距缩小到0.06rem */
       }
     }
-    
-    /* 制作区 */
+
+    /* ==================== 原料仓库（材料区） ==================== */
     .inventory-box {
-      background: #FFF8DC;
-      border-radius: 0.6rem;
-      padding: 0.4rem 0.6rem;
-      margin-bottom: 0.5rem;
-      flex-shrink: 0;
+      background: #FFF8DC; /* 浅黄色背景 */
+      border-radius: 0.6rem; /* 圆角0.6rem */
+      padding: 0.4rem 0.6rem; /* 上下0.4rem，左右0.6rem */
+      margin-bottom: 0.5rem; /* 底部外边距0.5rem */
+      flex-shrink: 0; /* 不允许压缩 */
       display: flex;
-      flex-direction: column;
-      min-height: auto;
+      flex-direction: column; /* 垂直排列子元素 */
+      min-height: auto; /* 最小高度自动，根据内容调整 */
     }
 
+    /* 仓库/配方/制作标题 */
     .inventory-title {
-      font-size: 0.8rem;
-      color: #8B4513;
+      font-size: 0.8rem; /* 字体大小0.8rem */
+      color: #8B4513; /* 棕色文字 */
       font-weight: bold;
-      flex-shrink: 0;
-      white-space: nowrap;
-      margin-bottom: 0.3rem;
+      flex-shrink: 0; /* 不允许压缩 */
+      white-space: nowrap; /* 不换行 */
+      margin-bottom: 0.3rem; /* 底部外边距0.3rem */
     }
 
+    /* 原料项目容器 */
     .inventory-items {
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.1rem;
-      align-content: flex-start;
-      width: 100%;
+      flex-wrap: wrap; /* 允许换行 */
+      gap: 0.1rem; /* 项目间距0.1rem */
+      align-content: flex-start; /* 内容顶部对齐 */
+      width: 100%; /* 宽度占满父容器 */
     }
 
+    /* ==================== 单个原料项 ==================== */
     .inv-item {
-      width: auto;
-      height: auto;
-      padding: 0.05rem;
-      background: transparent;
-      border-radius: 0;
+      width: auto; /* 宽度自动 */
+      height: auto; /* 高度自动 */
+      padding: 0.05rem; /* 内边距0.05rem */
+      background: transparent; /* 透明背景 */
+      border-radius: 0; /* 无圆角 */
       display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      border: none;
-      cursor: default;
-      transition: none;
-      position: relative;
-      flex-shrink: 0;
+      align-items: center; /* 垂直居中 */
+      justify-content: center; /* 水平居中 */
+      font-size: 1rem; /* 图标大小1rem */
+      border: none; /* 无边框 */
+      cursor: default; /* 默认光标 */
+      transition: none; /* 无过渡动画 */
+      position: relative; /* 相对定位，用于数量标签绝对定位 */
+      flex-shrink: 0; /* 不允许压缩 */
     }
 
+    /* 屏幕高度<800px时，缩小原料项 */
     @media (max-height: 800px) {
       .inv-item {
-        font-size: 0.9rem;
+        font-size: 0.9rem; /* 图标缩小到0.9rem */
       }
       .inv-item .count {
-        font-size: 0.55rem;
+        font-size: 0.55rem; /* 数量文字缩小到0.55rem */
       }
     }
 
+    /* 屏幕高度<600px时，进一步缩小原料项 */
     @media (max-height: 600px) {
       .inv-item {
-        font-size: 0.8rem;
+        font-size: 0.8rem; /* 图标缩小到0.8rem */
       }
       .inv-item .count {
-        font-size: 0.5rem;
+        font-size: 0.5rem; /* 数量文字缩小到0.5rem */
       }
     }
 
+    /* 原料项悬停效果（禁用） */
     .inv-item:hover {
-      transform: none;
-      border-color: transparent;
+      transform: none; /* 无变换 */
+      border-color: transparent; /* 透明边框 */
     }
 
+    /* 原料项选中状态（禁用） */
+    /* 原料项选中状态（禁用） */
     .inv-item.selected {
-      background: transparent;
-      border-color: transparent;
-      box-shadow: none;
+      background: transparent; /* 透明背景 */
+      border-color: transparent; /* 透明边框 */
+      box-shadow: none; /* 无阴影 */
     }
 
+    /* 原料数量标签 */
     .inv-item .count {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      background: transparent;
-      color: #8B4513;
-      font-size: 0.6rem;
-      padding: 0;
-      border-radius: 0;
+      position: absolute; /* 绝对定位 */
+      bottom: 0; /* 底部对齐 */
+      right: 0; /* 右侧对齐 */
+      background: transparent; /* 透明背景 */
+      color: #8B4513; /* 棕色文字 */
+      font-size: 0.6rem; /* 字体大小0.6rem */
+      padding: 0; /* 无内边距 */
+      border-radius: 0; /* 无圆角 */
       font-weight: bold;
     }
 
+    /* ==================== 配方书（制作区） ==================== */
     .recipes-box {
-      background: #FFF8DC;
-      border-radius: 0.6rem;
-      padding: 0.6rem;
-      margin-bottom: 0.75rem;
+      background: #FFF8DC; /* 浅黄色背景 */
+      border-radius: 0.6rem; /* 圆角0.6rem */
+      padding: 0.6rem; /* 内边距0.6rem */
+      margin-bottom: 0.75rem; /* 底部外边距0.75rem */
+      display: flex;
+      flex-direction: column; /* 垂直排列子元素 */
     }
 
+    /* ==================== 单个配方项 ==================== */
+    /* 每个配方占屏幕纵向10%高度 */
     .recipe-item {
       display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.4rem;
-      margin-bottom: 0.4rem;
-      background: white;
-      border-radius: 0.5rem;
-      border: 0.12rem solid #DEB887;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-size: 0.8rem;
+      align-items: center; /* 垂直居中 */
+      gap: 0.4rem; /* 子元素间距0.4rem */
+      padding: 0.4rem; /* 内边距0.4rem */
+      margin-bottom: 0.4rem; /* 底部外边距0.4rem */
+      background: white; /* 白色背景 */
+      border-radius: 0.5rem; /* 圆角0.5rem */
+      border: 0.12rem solid #DEB887; /* 边框宽度0.12rem */
+      cursor: pointer; /* 鼠标指针 */
+      transition: all 0.3s; /* 过渡动画0.3秒 */
+      font-size: 0.8rem; /* 字体大小0.8rem */
+      height: 10vh; /* 占视口高度的10% */
+      min-height: 10vh; /* 最小高度10vh，防止压缩 */
+      max-height: 10vh; /* 最大高度10vh，防止拉伸 */
+      flex-shrink: 0; /* 不允许压缩 */
     }
 
+    /* 最后一个配方项无底部外边距 */
+    .recipe-item:last-child {
+      margin-bottom: 0;
+    }
+
+    /* 配方项鼠标悬停效果 */
     .recipe-item:hover {
-      border-color: #8B4513;
-      transform: translateX(0.18rem);
+      border-color: #8B4513; /* 边框变为深棕色 */
+      transform: translateX(0.18rem); /* 向右移动0.18rem */
     }
 
+    /* 可制作状态（原料充足） */
     .recipe-item.can-craft {
-      border-color: #90EE90;
-      background: #F0FFF0;
+      border-color: #90EE90; /* 浅绿色边框 */
+      background: #F0FFF0; /* 浅绿色背景 */
     }
 
+    /* ==================== 配方原料列表 ==================== */
     .recipe-ingredients {
       display: flex;
-      gap: 0.18rem;
+      gap: 0.3rem; /* 原料图标间距0.3rem */
+      flex-shrink: 0; /* 不允许压缩 */
+      align-items: center; /* 垂直居中 */
     }
 
+    /* 单个原料图标 */
     .recipe-ing {
-      font-size: 1rem;
+      font-size: 2.5rem; /* 图标大小2.5rem */
+      flex-shrink: 0; /* 不允许压缩 */
+      line-height: 1; /* 行高1，紧凑显示 */
     }
 
+    /* 配方箭头 */
     .recipe-arrow {
-      font-size: 1rem;
-      color: #8B4513;
+      font-size: 1.5rem; /* 箭头大小1.5rem */
+      color: #8B4513; /* 棕色 */
+      flex-shrink: 0; /* 不允许压缩 */
     }
 
+    /* 配方结果图标 */
     .recipe-result {
-      font-size: 1.4rem;
-      margin-left: auto;
+      font-size: 3rem; /* 图标大小3rem */
+      margin-left: auto; /* 自动左边距，推到右侧 */
+      flex-shrink: 0; /* 不允许压缩 */
+      line-height: 1; /* 行高1，紧凑显示 */
     }
 
+    /* 配方制作时间 */
     .recipe-time {
-      font-size: 0.6rem;
-      color: #666;
+      font-size: 0.7rem; /* 字体大小0.7rem */
+      color: #666; /* 灰色文字 */
+      flex-shrink: 0; /* 不允许压缩 */
     }
 
+    /* ==================== 配方图标响应式（横向） ==================== */
+    /* 屏幕宽度<1400px时，缩小配方图标 */
+    @media (max-width: 1400px) {
+      .recipe-ingredients {
+        gap: 0.25rem; /* 间距缩小到0.25rem */
+      }
+      .recipe-ing {
+        font-size: 2.2rem; /* 原料图标缩小到2.2rem */
+      }
+      .recipe-arrow {
+        font-size: 1.3rem; /* 箭头缩小到1.3rem */
+      }
+      .recipe-result {
+        font-size: 2.7rem; /* 结果图标缩小到2.7rem */
+      }
+    }
+
+    /* 屏幕宽度<1200px时，进一步缩小配方图标 */
+    @media (max-width: 1200px) {
+      .recipe-ingredients {
+        gap: 0.2rem; /* 间距缩小到0.2rem */
+      }
+      .recipe-ing {
+        font-size: 2rem; /* 原料图标缩小到2rem */
+      }
+      .recipe-arrow {
+        font-size: 1.2rem; /* 箭头缩小到1.2rem */
+      }
+      .recipe-result {
+        font-size: 2.5rem; /* 结果图标缩小到2.5rem */
+      }
+    }
+
+    /* 屏幕宽度<1000px时，最小配方图标 */
+    @media (max-width: 1000px) {
+      .recipe-ingredients {
+        gap: 0.15rem; /* 间距缩小到0.15rem */
+      }
+      .recipe-ing {
+        font-size: 1.8rem; /* 原料图标缩小到1.8rem */
+      }
+      .recipe-arrow {
+        font-size: 1.1rem; /* 箭头缩小到1.1rem */
+      }
+      .recipe-result {
+        font-size: 2.3rem; /* 结果图标缩小到2.3rem */
+      }
+    }
+
+    /* ==================== 制作中队列（材料区） ==================== */
     .crafting-queue {
-      background: #FFF8DC;
-      border-radius: 0.6rem;
-      padding: 0.6rem;
+      background: #FFF8DC; /* 浅黄色背景 */
+      border-radius: 0.6rem; /* 圆角0.6rem */
+      padding: 0.6rem; /* 内边距0.6rem */
+      margin-bottom: 0.5rem; /* 底部外边距0.5rem */
+      flex-shrink: 0; /* 不允许压缩 */
     }
 
+    /* 单个制作中项目 */
     .crafting-item {
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.4rem;
-      margin-bottom: 0.4rem;
-      background: white;
-      border-radius: 0.5rem;
+      align-items: center; /* 垂直居中 */
+      gap: 0.5rem; /* 子元素间距0.5rem */
+      padding: 0.4rem; /* 内边距0.4rem */
+      margin-bottom: 0.4rem; /* 底部外边距0.4rem */
+      background: white; /* 白色背景 */
+      border-radius: 0.5rem; /* 圆角0.5rem */
     }
 
+    /* 制作进度条容器 */
     .crafting-progress {
-      flex: 1;
-      height: 0.4rem;
-      background: #eee;
-      border-radius: 0.18rem;
-      overflow: hidden;
+      flex: 1; /* 占据剩余空间 */
+      height: 0.4rem; /* 高度0.4rem */
+      background: #eee; /* 浅灰色背景 */
+      border-radius: 0.18rem; /* 圆角0.18rem */
+      overflow: hidden; /* 隐藏溢出 */
     }
 
+    /* 制作进度条填充 */
     .crafting-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #F5DEB3, #8B4513);
-      border-radius: 0.18rem;
-      transition: width 0.3s;
+      height: 100%; /* 高度占满进度条 */
+      background: linear-gradient(90deg, #F5DEB3, #8B4513); /* 渐变色：浅棕到深棕 */
+      border-radius: 0.18rem; /* 圆角0.18rem */
+      transition: width 0.3s; /* 宽度变化过渡0.3秒 */
     }
-    
-    /* 市场区 */
+
+    /* ==================== 市场购买区（材料区） ==================== */
     .market-items {
       display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
+      flex-direction: column; /* 垂直排列 */
+      gap: 0.3rem; /* 项目间距0.3rem */
     }
 
+    /* 单个市场购买项 */
     .market-item {
       display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      padding: 0.6rem;
-      background: white;
-      border-radius: 0.6rem;
-      border: 0.12rem solid #DEB887;
-      transition: all 0.3s;
+      align-items: center; /* 垂直居中 */
+      gap: 0.4rem; /* 子元素间距0.4rem */
+      padding: 0.4rem; /* 内边距0.4rem */
+      background: white; /* 白色背景 */
+      border-radius: 0.4rem; /* 圆角0.4rem */
+      border: 0.12rem solid #DEB887; /* 边框宽度0.12rem */
+      transition: all 0.3s; /* 过渡动画0.3秒 */
     }
 
+    /* 市场项鼠标悬停效果 */
     .market-item:hover {
-      border-color: #8B4513;
-      transform: translateX(0.18rem);
+      border-color: #8B4513; /* 边框变为深棕色 */
+      transform: translateX(0.18rem); /* 向右移动0.18rem */
     }
 
+    /* 市场项图标 */
     .market-item-icon {
-      font-size: 2rem;
-      width: 2.8rem;
-      height: 2.8rem;
+      font-size: 1.5rem; /* 图标大小1.5rem */
+      width: 2rem; /* 宽度2rem */
+      height: 2rem; /* 高度2rem */
       display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #F5DEB3;
-      border-radius: 0.5rem;
+      align-items: center; /* 垂直居中 */
+      justify-content: center; /* 水平居中 */
+      background: #F5DEB3; /* 浅棕色背景 */
+      border-radius: 0.3rem; /* 圆角0.3rem */
+      flex-shrink: 0; /* 不允许压缩 */
     }
 
+    /* 市场项信息容器 */
     .market-item-info {
-      flex: 1;
+      flex: 1; /* 占据剩余空间 */
+      min-width: 0; /* 最小宽度0，允许完全压缩 */
     }
 
+    /* 市场项名称 */
     .market-item-name {
       font-weight: bold;
-      color: #8B4513;
-      font-size: 0.85rem;
+      color: #8B4513; /* 棕色文字 */
+      font-size: 0.75rem; /* 字体大小0.75rem */
     }
 
+    /* 市场项描述 */
     .market-item-desc {
-      font-size: 0.7rem;
-      color: #666;
+      font-size: 0.65rem; /* 字体大小0.65rem */
+      color: #666; /* 灰色文字 */
+      white-space: nowrap; /* 不换行 */
+      overflow: hidden; /* 隐藏溢出 */
+      text-overflow: ellipsis; /* 溢出显示省略号 */
     }
 
+    /* 市场购买按钮 */
     .market-btn {
-      padding: 0.4rem 0.75rem;
-      background: #90EE90;
-      border: none;
-      border-radius: 0.9rem;
-      cursor: pointer;
+      padding: 0.3rem 0.6rem; /* 上下0.3rem，左右0.6rem */
+      background: #90EE90; /* 浅绿色背景 */
+      border: none; /* 无边框 */
+      border-radius: 0.6rem; /* 圆角0.6rem */
+      cursor: pointer; /* 鼠标指针 */
       font-weight: bold;
-      font-size: 0.75rem;
-      color: #2E8B57;
-      transition: all 0.3s;
+      font-size: 0.7rem; /* 字体大小0.7rem */
+      color: #2E8B57; /* 深绿色文字 */
+      transition: all 0.3s; /* 过渡动画0.3秒 */
+      white-space: nowrap; /* 不换行 */
+      flex-shrink: 0; /* 不允许压缩 */
     }
 
+    /* 市场按钮鼠标悬停效果 */
     .market-btn:hover {
-      background: #7FDD7F;
-      transform: scale(1.05);
+      background: #7FDD7F; /* 深绿色背景 */
+      transform: scale(1.05); /* 放大到105% */
     }
 
+    /* 市场按钮禁用状态 */
     .market-btn:disabled {
-      background: #ccc;
-      color: #999;
-      cursor: not-allowed;
-      transform: none;
-    }
-    
-    /* 售卖区 */
-    .counter-box {
-      background: #FFF8DC;
-      border-radius: 0.6rem;
-      padding: 0.6rem;
-      margin-bottom: 0.75rem;
-      min-height: 5rem;
+      background: #ccc; /* 灰色背景 */
+      color: #999; /* 浅灰色文字 */
+      cursor: not-allowed; /* 禁止光标 */
+      transform: none; /* 无变换 */
     }
 
+    /* ==================== 市场区响应式（纵向） ==================== */
+    /* 屏幕高度<800px时，缩小市场项 */
+    @media (max-height: 800px) {
+      .market-items {
+        gap: 0.25rem; /* 间距缩小到0.25rem */
+      }
+      .market-item {
+        padding: 0.35rem; /* 内边距缩小到0.35rem */
+        gap: 0.35rem; /* 子元素间距缩小到0.35rem */
+      }
+      .market-item-icon {
+        font-size: 1.3rem; /* 图标缩小到1.3rem */
+        width: 1.8rem; /* 宽度缩小到1.8rem */
+        height: 1.8rem; /* 高度缩小到1.8rem */
+      }
+      .market-item-name {
+        font-size: 0.7rem; /* 名称字体缩小到0.7rem */
+      }
+      .market-item-desc {
+        font-size: 0.6rem; /* 描述字体缩小到0.6rem */
+      }
+      .market-btn {
+        padding: 0.25rem 0.5rem; /* 按钮内边距缩小 */
+        font-size: 0.65rem; /* 按钮字体缩小到0.65rem */
+      }
+    }
+
+    /* 屏幕高度<600px时，进一步缩小市场项 */
+    @media (max-height: 600px) {
+      .market-items {
+        gap: 0.2rem; /* 间距缩小到0.2rem */
+      }
+      .market-item {
+        padding: 0.3rem; /* 内边距缩小到0.3rem */
+        gap: 0.3rem; /* 子元素间距缩小到0.3rem */
+      }
+      .market-item-icon {
+        font-size: 1.2rem; /* 图标缩小到1.2rem */
+        width: 1.6rem; /* 宽度缩小到1.6rem */
+        height: 1.6rem; /* 高度缩小到1.6rem */
+      }
+      .market-item-name {
+        font-size: 0.65rem; /* 名称字体缩小到0.65rem */
+      }
+      .market-item-desc {
+        font-size: 0.55rem; /* 描述字体缩小到0.55rem */
+      }
+      .market-btn {
+        padding: 0.2rem 0.4rem; /* 按钮内边距缩小 */
+        font-size: 0.6rem; /* 按钮字体缩小到0.6rem */
+      }
+    }
+
+    /* ==================== 售卖区 - 柜台 ==================== */
+    .counter-box {
+      background: #FFF8DC; /* 浅黄色背景 */
+      border-radius: 0.6rem; /* 圆角0.6rem */
+      padding: 0.6rem; /* 内边距0.6rem */
+      margin-bottom: 0.75rem; /* 底部外边距0.75rem */
+      min-height: 5rem; /* 最小高度5rem */
+    }
+
+    /* 柜台面包容器 */
     .counter-items {
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
+      flex-wrap: wrap; /* 允许换行 */
+      gap: 0.4rem; /* 项目间距0.4rem */
     }
 
+    /* 单个柜台面包项 */
     .counter-item {
-      width: 3.1rem;
-      height: 3.1rem;
-      background: white;
-      border-radius: 0.5rem;
+      width: 3.1rem; /* 宽度3.1rem */
+      height: 3.1rem; /* 高度3.1rem */
+      background: white; /* 白色背景 */
+      border-radius: 0.5rem; /* 圆角0.5rem */
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border: 0.12rem solid #DEB887;
-      cursor: pointer;
-      transition: all 0.3s;
-      position: relative;
+      flex-direction: column; /* 垂直排列子元素 */
+      align-items: center; /* 水平居中 */
+      justify-content: center; /* 垂直居中 */
+      border: 0.12rem solid #DEB887; /* 边框宽度0.12rem */
+      cursor: pointer; /* 鼠标指针 */
+      transition: all 0.3s; /* 过渡动画0.3秒 */
+      position: relative; /* 相对定位，用于数量标签绝对定位 */
     }
 
+    /* 柜台面包项鼠标悬停效果 */
     .counter-item:hover {
-      transform: scale(1.05);
-      border-color: #8B4513;
+      transform: scale(1.05); /* 放大到105% */
+      border-color: #8B4513; /* 边框变为深棕色 */
     }
 
+    /* 柜台面包项选中状态 */
     .counter-item.selected {
-      background: #F5DEB3;
-      border-color: #8B4513;
-      box-shadow: 0 0 0.6rem rgba(139, 69, 19, 0.5);
+      background: #F5DEB3; /* 浅棕色背景 */
+      border-color: #8B4513; /* 深棕色边框 */
+      box-shadow: 0 0 0.6rem rgba(139, 69, 19, 0.5); /* 发光效果：模糊0.6rem */
     }
 
+    /* 面包图标 */
     .counter-item .bread-icon {
-      font-size: 1.6rem;
+      font-size: 1.6rem; /* 图标大小1.6rem */
     }
 
+    /* 面包价格 */
     .counter-item .bread-price {
-      font-size: 0.55rem;
-      color: #8B4513;
+      font-size: 0.55rem; /* 字体大小0.55rem */
+      color: #8B4513; /* 棕色文字 */
       font-weight: bold;
     }
 
+    /* 面包数量标签 */
     .counter-item .count {
-      position: absolute;
-      top: 0.06rem;
-      right: 0.06rem;
-      background: #8B4513;
-      color: white;
-      font-size: 0.55rem;
-      padding: 0.06rem 0.25rem;
-      border-radius: 0.5rem;
+      position: absolute; /* 绝对定位 */
+      top: 0.06rem; /* 距离顶部0.06rem */
+      right: 0.06rem; /* 距离右侧0.06rem */
+      background: #8B4513; /* 深棕色背景 */
+      color: white; /* 白色文字 */
+      font-size: 0.55rem; /* 字体大小0.55rem */
+      padding: 0.06rem 0.25rem; /* 上下0.06rem，左右0.25rem */
+      border-radius: 0.5rem; /* 圆角0.5rem */
     }
 
+    /* ==================== 售卖区 - 顾客 ==================== */
     .customers-box {
-      background: #FFF8DC;
-      border-radius: 0.6rem;
-      padding: 0.6rem;
+      background: #FFF8DC; /* 浅黄色背景 */
+      border-radius: 0.6rem; /* 圆角0.6rem */
+      padding: 0.6rem; /* 内边距0.6rem */
     }
 
+    /* 单个顾客项 */
     .customer {
       display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem;
-      margin-bottom: 0.5rem;
-      background: white;
-      border-radius: 0.6rem;
-      border: 0.12rem solid #DEB887;
-      animation: slideIn 0.5s ease;
+      align-items: center; /* 垂直居中 */
+      gap: 0.5rem; /* 子元素间距0.5rem */
+      padding: 0.5rem; /* 内边距0.5rem */
+      margin-bottom: 0.5rem; /* 底部外边距0.5rem */
+      background: white; /* 白色背景 */
+      border-radius: 0.6rem; /* 圆角0.6rem */
+      border: 0.12rem solid #DEB887; /* 边框宽度0.12rem */
+      animation: slideIn 0.5s ease; /* 滑入动画，持续0.5秒 */
     }
 
+    /* 顾客滑入动画定义 */
     @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+      from { transform: translateX(100%); opacity: 0; } /* 从右侧100%位置，透明 */
+      to { transform: translateX(0); opacity: 1; } /* 到原位置，不透明 */
     }
 
+    /* 顾客头像 */
     .customer-avatar {
-      font-size: 2rem;
-      width: 2.5rem;
-      height: 2.5rem;
+      font-size: 2rem; /* 图标大小2rem */
+      width: 2.5rem; /* 宽度2.5rem */
+      height: 2.5rem; /* 高度2.5rem */
       display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #F5DEB3;
-      border-radius: 50%;
+      align-items: center; /* 垂直居中 */
+      justify-content: center; /* 水平居中 */
+      background: #F5DEB3; /* 浅棕色背景 */
+      border-radius: 50%; /* 圆形 */
     }
 
+    /* 顾客信息容器 */
     .customer-info {
-      flex: 1;
+      flex: 1; /* 占据剩余空间 */
     }
 
+    /* 顾客姓名 */
     .customer-name {
       font-weight: bold;
-      color: #8B4513;
-      font-size: 0.75rem;
+      color: #8B4513; /* 棕色文字 */
+      font-size: 0.75rem; /* 字体大小0.75rem */
     }
 
+    /* 顾客需求 */
     .customer-want {
-      font-size: 0.7rem;
-      color: #666;
+      font-size: 0.7rem; /* 字体大小0.7rem */
+      color: #666; /* 灰色文字 */
       display: flex;
-      align-items: center;
-      gap: 0.18rem;
+      align-items: center; /* 垂直居中 */
+      gap: 0.18rem; /* 子元素间距0.18rem */
     }
 
+    /* 顾客需求图标 */
     .customer-want-emoji {
-      font-size: 1.1rem;
+      font-size: 1.1rem; /* 图标大小1.1rem */
     }
 
+    /* 顾客出售按钮 */
     .customer-btn {
-      padding: 0.4rem 0.75rem;
-      background: #90EE90;
-      border: none;
-      border-radius: 0.9rem;
-      cursor: pointer;
+      padding: 0.4rem 0.75rem; /* 上下0.4rem，左右0.75rem */
+      background: #90EE90; /* 浅绿色背景 */
+      border: none; /* 无边框 */
+      border-radius: 0.9rem; /* 圆角0.9rem */
+      cursor: pointer; /* 鼠标指针 */
       font-weight: bold;
-      font-size: 0.75rem;
-      color: #2E8B57;
-      transition: all 0.3s;
+      font-size: 0.75rem; /* 字体大小0.75rem */
+      color: #2E8B57; /* 深绿色文字 */
+      transition: all 0.3s; /* 过渡动画0.3秒 */
     }
 
+    /* 顾客按钮鼠标悬停效果 */
     .customer-btn:hover {
-      background: #7FDD7F;
-      transform: scale(1.05);
+      background: #7FDD7F; /* 深绿色背景 */
+      transform: scale(1.05); /* 放大到105% */
     }
 
+    /* 顾客按钮禁用状态 */
     .customer-btn:disabled {
-      background: #ccc;
-      color: #999;
-      cursor: not-allowed;
-      transform: none;
+      background: #ccc; /* 灰色背景 */
+      color: #999; /* 浅灰色文字 */
+      cursor: not-allowed; /* 禁止光标 */
+      transform: none; /* 无变换 */
     }
-    
-    /* 弹窗 */
+
+    /* ==================== 弹窗系统 ==================== */
     .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.7);
+      position: fixed; /* 固定定位 */
+      top: 0; /* 顶部对齐 */
+      left: 0; /* 左侧对齐 */
+      right: 0; /* 右侧对齐 */
+      bottom: 0; /* 底部对齐 */
+      background: rgba(0,0,0,0.7); /* 半透明黑色背景，透明度70% */
       display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s;
-      padding: 1rem;
+      align-items: center; /* 垂直居中 */
+      justify-content: center; /* 水平居中 */
+      z-index: 1000; /* 层级1000，显示在最上层 */
+      opacity: 0; /* 初始透明 */
+      visibility: hidden; /* 初始隐藏 */
+      transition: all 0.3s; /* 过渡动画0.3秒 */
+      padding: 1rem; /* 内边距1rem */
     }
 
+    /* 弹窗激活状态 */
     .modal-overlay.active {
-      opacity: 1;
-      visibility: visible;
+      opacity: 1; /* 完全不透明 */
+      visibility: visible; /* 可见 */
     }
 
+    /* 弹窗主体 */
     .modal {
-      background: white;
-      border-radius: 1.2rem;
-      padding: 1.5rem;
-      max-width: 31rem;
-      width: 90%;
-      text-align: center;
-      transform: scale(0.8);
-      transition: all 0.3s;
-      max-height: 90vh;
-      overflow-y: auto;
+      background: white; /* 白色背景 */
+      border-radius: 1.2rem; /* 圆角1.2rem */
+      padding: 1.5rem; /* 内边距1.5rem */
+      max-width: 31rem; /* 最大宽度31rem */
+      width: 90%; /* 宽度占90% */
+      text-align: center; /* 文字居中 */
+      transform: scale(0.8); /* 初始缩小到80% */
+      transition: all 0.3s; /* 过渡动画0.3秒 */
+      max-height: 90vh; /* 最大高度90vh */
+      overflow-y: auto; /* 纵向滚动 */
     }
 
+    /* 弹窗激活时的主体 */
     .modal-overlay.active .modal {
-      transform: scale(1);
+      transform: scale(1); /* 恢复到100% */
     }
 
+    /* 弹窗标题 */
     .modal-title {
-      font-size: 1.5rem;
-      color: #8B4513;
-      margin-bottom: 0.9rem;
+      font-size: 1.5rem; /* 字体大小1.5rem */
+      color: #8B4513; /* 棕色文字 */
+      margin-bottom: 0.9rem; /* 底部外边距0.9rem */
     }
 
+    /* 弹窗内容 */
     .modal-content {
-      font-size: 1rem;
-      color: #666;
-      margin-bottom: 0.9rem;
+      font-size: 1rem; /* 字体大小1rem */
+      color: #666; /* 灰色文字 */
+      margin-bottom: 0.9rem; /* 底部外边距0.9rem */
     }
 
+    /* 弹窗统计数据容器 */
     .modal-stats {
-      background: #FFF8DC;
-      border-radius: 0.9rem;
-      padding: 0.9rem;
-      margin-bottom: 0.9rem;
+      background: #FFF8DC; /* 浅黄色背景 */
+      border-radius: 0.9rem; /* 圆角0.9rem */
+      padding: 0.9rem; /* 内边距0.9rem */
+      margin-bottom: 0.9rem; /* 底部外边距0.9rem */
     }
 
+    /* 统计数据行 */
     .stat-row {
       display: flex;
-      justify-content: space-between;
-      padding: 0.5rem 0;
-      border-bottom: 0.06rem solid #DEB887;
-      font-size: 0.85rem;
+      justify-content: space-between; /* 两端对齐 */
+      padding: 0.5rem 0; /* 上下0.5rem，左右0 */
+      border-bottom: 0.06rem solid #DEB887; /* 底部边框：宽度0.06rem */
+      font-size: 0.85rem; /* 字体大小0.85rem */
     }
 
+    /* 最后一行统计数据无底部边框 */
     .stat-row:last-child {
-      border-bottom: none;
+      border-bottom: none; /* 无底部边框 */
     }
 
+    /* 弹窗按钮 */
     .modal-btn {
-      padding: 0.75rem 2.2rem;
-      background: #8B4513;
-      color: white;
-      border: none;
-      border-radius: 1.5rem;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s;
+      padding: 0.75rem 2.2rem; /* 上下0.75rem，左右2.2rem */
+      background: #8B4513; /* 深棕色背景 */
+      color: white; /* 白色文字 */
+      border: none; /* 无边框 */
+      border-radius: 1.5rem; /* 圆角1.5rem */
+      font-size: 1rem; /* 字体大小1rem */
+      cursor: pointer; /* 鼠标指针 */
+      transition: all 0.3s; /* 过渡动画0.3秒 */
     }
 
+    /* 弹窗按钮鼠标悬停效果 */
     .modal-btn:hover {
-      background: #A0522D;
-      transform: scale(1.05);
-    }
-    
-    /* 升级商店 */
-    .upgrade-shop {
-      margin-top: 0.9rem;
+      background: #A0522D; /* 浅棕色背景 */
+      transform: scale(1.05); /* 放大到105% */
     }
 
+    /* ==================== 升级商店 ==================== */
+    .upgrade-shop {
+      margin-top: 0.9rem; /* 顶部外边距0.9rem */
+    }
+
+    /* 单个升级项 */
     .upgrade-item {
       display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem;
-      margin-bottom: 0.5rem;
-      background: #FFF8DC;
-      border-radius: 0.6rem;
-      border: 0.12rem solid #DEB887;
+      align-items: center; /* 垂直居中 */
+      gap: 0.75rem; /* 子元素间距0.75rem */
+      padding: 0.75rem; /* 内边距0.75rem */
+      margin-bottom: 0.5rem; /* 底部外边距0.5rem */
+      background: #FFF8DC; /* 浅黄色背景 */
+      border-radius: 0.6rem; /* 圆角0.6rem */
+      border: 0.12rem solid #DEB887; /* 边框宽度0.12rem */
     }
 
+    /* 升级图标 */
     .upgrade-icon {
-      font-size: 1.9rem;
+      font-size: 1.9rem; /* 图标大小1.9rem */
     }
 
+    /* 升级信息容器 */
     .upgrade-info {
-      flex: 1;
-      text-align: left;
+      flex: 1; /* 占据剩余空间 */
+      text-align: left; /* 文字左对齐 */
     }
 
+    /* 升级名称 */
     .upgrade-name {
       font-weight: bold;
-      color: #8B4513;
-      font-size: 0.85rem;
+      color: #8B4513; /* 棕色文字 */
+      font-size: 0.85rem; /* 字体大小0.85rem */
     }
 
+    /* 升级描述 */
     .upgrade-desc {
-      font-size: 0.75rem;
-      color: #666;
+      font-size: 0.75rem; /* 字体大小0.75rem */
+      color: #666; /* 灰色文字 */
     }
 
+    /* 升级购买按钮 */
     .upgrade-btn {
-      padding: 0.4rem 0.9rem;
-      background: #90EE90;
-      border: none;
-      border-radius: 0.9rem;
-      cursor: pointer;
+      padding: 0.4rem 0.9rem; /* 上下0.4rem，左右0.9rem */
+      background: #90EE90; /* 浅绿色背景 */
+      border: none; /* 无边框 */
+      border-radius: 0.9rem; /* 圆角0.9rem */
+      cursor: pointer; /* 鼠标指针 */
       font-weight: bold;
-      font-size: 0.75rem;
-      transition: all 0.3s;
+      font-size: 0.75rem; /* 字体大小0.75rem */
+      transition: all 0.3s; /* 过渡动画0.3秒 */
     }
 
+    /* 升级按钮鼠标悬停效果 */
     .upgrade-btn:hover {
-      background: #7FDD7F;
+      background: #7FDD7F; /* 深绿色背景 */
     }
 
+    /* 升级按钮禁用状态 */
     .upgrade-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
+      background: #ccc; /* 灰色背景 */
+      cursor: not-allowed; /* 禁止光标 */
     }
 
-    /* 提示信息 */
+    /* ==================== 提示信息（Toast） ==================== */
     .toast {
-      position: fixed;
-      bottom: 1.2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #8B4513;
-      color: white;
-      padding: 0.6rem 1.5rem;
-      border-radius: 1.5rem;
-      font-size: 0.85rem;
-      z-index: 1001;
-      opacity: 0;
-      transition: opacity 0.3s;
-      max-width: 90%;
-      text-align: center;
+      position: fixed; /* 固定定位 */
+      bottom: 1.2rem; /* 距离底部1.2rem */
+      left: 50%; /* 左侧50% */
+      transform: translateX(-50%); /* 向左偏移50%，实现水平居中 */
+      background: #8B4513; /* 深棕色背景 */
+      color: white; /* 白色文字 */
+      padding: 0.6rem 1.5rem; /* 上下0.6rem，左右1.5rem */
+      border-radius: 1.5rem; /* 圆角1.5rem */
+      font-size: 0.85rem; /* 字体大小0.85rem */
+      z-index: 1001; /* 层级1001，显示在弹窗之上 */
+      opacity: 0; /* 初始透明 */
+      transition: opacity 0.3s; /* 透明度过渡0.3秒 */
+      max-width: 90%; /* 最大宽度90% */
+      text-align: center; /* 文字居中 */
     }
 
+    /* 提示信息显示状态 */
     .toast.show {
-      opacity: 1;
+      opacity: 1; /* 完全不透明 */
     }
 
-    /* 选中提示 */
+    /* ==================== 选中提示 ==================== */
     .selection-hint {
-      font-size: 0.7rem;
-      color: #8B4513;
-      text-align: center;
-      margin-bottom: 0.3rem;
-      padding: 0.2rem;
-      background: rgba(245, 222, 179, 0.5);
-      border-radius: 0.3rem;
-      flex-shrink: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 0.7rem; /* 字体大小0.7rem */
+      color: #8B4513; /* 棕色文字 */
+      text-align: center; /* 文字居中 */
+      margin-bottom: 0.3rem; /* 底部外边距0.3rem */
+      padding: 0.2rem; /* 内边距0.2rem */
+      background: rgba(245, 222, 179, 0.5); /* 半透明浅棕色背景，透明度50% */
+      border-radius: 0.3rem; /* 圆角0.3rem */
+      flex-shrink: 0; /* 不允许压缩 */
+      white-space: nowrap; /* 不换行 */
+      overflow: hidden; /* 隐藏溢出 */
+      text-overflow: ellipsis; /* 溢出显示省略号 */
     }
 
+    /* 屏幕高度<800px时，缩小选中提示 */
     @media (max-height: 800px) {
       .selection-hint {
-        margin-bottom: 0.2rem;
-        padding: 0.15rem;
-        font-size: 0.65rem;
+        margin-bottom: 0.2rem; /* 底部外边距缩小到0.2rem */
+        padding: 0.15rem; /* 内边距缩小到0.15rem */
+        font-size: 0.65rem; /* 字体缩小到0.65rem */
       }
     }
 
+    /* 屏幕高度<600px时，进一步缩小选中提示 */
     @media (max-height: 600px) {
       .selection-hint {
-        margin-bottom: 0.15rem;
-        padding: 0.1rem;
-        font-size: 0.6rem;
+        margin-bottom: 0.15rem; /* 底部外边距缩小到0.15rem */
+        padding: 0.1rem; /* 内边距缩小到0.1rem */
+        font-size: 0.6rem; /* 字体缩小到0.6rem */
       }
     }
 
-    /* 水井 */
+    /* ==================== 水井（制作区） ==================== */
     .well-box {
-      background: #E0F7FA;
-      border-radius: 0.6rem;
-      padding: 0.4rem 0.6rem;
-      margin-bottom: 0.5rem;
-      border: 0.12rem solid #4DD0E1;
-      flex-shrink: 0;
-      height: 10%;
-      min-height: 10%;
-      max-height: 10%;
+      background: #E0F7FA; /* 浅蓝色背景 */
+      border-radius: 0.6rem; /* 圆角0.6rem */
+      padding: 0.4rem 0.6rem; /* 上下0.4rem，左右0.6rem */
+      margin-bottom: 0.5rem; /* 底部外边距0.5rem */
+      border: 0.12rem solid #4DD0E1; /* 边框宽度0.12rem，蓝色 */
+      flex-shrink: 0; /* 不允许压缩 */
+      height: 10%; /* 占父容器高度的10% */
+      min-height: 10%; /* 最小高度10%，防止压缩 */
+      max-height: 10%; /* 最大高度10%，防止拉伸 */
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
+      align-items: center; /* 垂直居中 */
+      justify-content: space-between; /* 两端对齐 */
+      gap: 0.5rem; /* 子元素间距0.5rem */
     }
 
+    /* 水井标题 */
     .well-title {
-      font-size: 0.85rem;
-      color: #00838F;
+      font-size: 0.85rem; /* 字体大小0.85rem */
+      color: #00838F; /* 深蓝色文字 */
       font-weight: bold;
-      white-space: nowrap;
-      flex-shrink: 0;
+      white-space: nowrap; /* 不换行 */
+      flex-shrink: 0; /* 不允许压缩 */
     }
 
+    /* 水井按钮 */
     .well-btn {
-      padding: 0.3rem 0.8rem;
-      background: #4DD0E1;
-      border: none;
-      border-radius: 1.2rem;
-      cursor: pointer;
+      padding: 0.3rem 0.8rem; /* 上下0.3rem，左右0.8rem */
+      background: #4DD0E1; /* 蓝色背景 */
+      border: none; /* 无边框 */
+      border-radius: 1.2rem; /* 圆角1.2rem */
+      cursor: pointer; /* 鼠标指针 */
       font-weight: bold;
-      color: white;
-      font-size: 0.75rem;
-      transition: all 0.3s;
-      white-space: nowrap;
-      flex-shrink: 0;
-      max-height: 100%;
-      height: auto;
+      color: white; /* 白色文字 */
+      font-size: 0.75rem; /* 字体大小0.75rem */
+      transition: all 0.3s; /* 过渡动画0.3秒 */
+      white-space: nowrap; /* 不换行 */
+      flex-shrink: 0; /* 不允许压缩 */
+      max-height: 100%; /* 最大高度100% */
+      height: auto; /* 高度自动 */
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: center; /* 垂直居中 */
+      justify-content: center; /* 水平居中 */
     }
 
+    /* 水井按钮鼠标悬停效果 */
     .well-btn:hover {
-      background: #26C6DA;
-      transform: scale(1.05);
+      background: #26C6DA; /* 深蓝色背景 */
+      transform: scale(1.05); /* 放大到105% */
     }
 
+    /* 水井按钮禁用状态 */
     .well-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-      transform: none;
+      background: #ccc; /* 灰色背景 */
+      cursor: not-allowed; /* 禁止光标 */
+      transform: none; /* 无变换 */
     }
 
+    /* 水井进度条 */
     .well-progress {
-      display: none;
-      width: 100%;
-      height: 0.3rem;
-      background: #B2EBF2;
-      border-radius: 0.18rem;
-      overflow: hidden;
-      position: absolute;
-      bottom: 0.2rem;
-      left: 0.6rem;
-      right: 0.6rem;
-      width: calc(100% - 1.2rem);
+      display: none; /* 默认隐藏 */
+      width: 100%; /* 宽度100% */
+      height: 0.3rem; /* 高度0.3rem */
+      background: #B2EBF2; /* 浅蓝色背景 */
+      border-radius: 0.18rem; /* 圆角0.18rem */
+      overflow: hidden; /* 隐藏溢出 */
+      position: absolute; /* 绝对定位 */
+      bottom: 0.2rem; /* 距离底部0.2rem */
+      left: 0.6rem; /* 距离左侧0.6rem */
+      right: 0.6rem; /* 距离右侧0.6rem */
+      width: calc(100% - 1.2rem); /* 宽度：100% - 左右边距1.2rem */
     }
 
+    /* 打水中状态显示进度条 */
     .well-box.fetching .well-progress {
-      display: block;
+      display: block; /* 显示进度条 */
     }
 
+    /* 水井进度条填充 */
     .well-progress-fill {
-      height: 100%;
-      background: #00BCD4;
-      border-radius: 0.18rem;
-      transition: width 0.3s;
+      height: 100%; /* 高度占满进度条 */
+      background: #00BCD4; /* 深蓝色 */
+      border-radius: 0.18rem; /* 圆角0.18rem */
+      transition: width 0.3s; /* 宽度变化过渡0.3秒 */
     }
 
-    /* 屏幕窄时压缩制作区间距 */
+    /* ==================== 响应式断点 - 屏幕高度<800px ==================== */
+    /* 压缩制作区和材料区的间距 */
     @media (max-height: 800px) {
       .well-box {
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.4rem; /* 水井底部外边距缩小到0.4rem */
       }
       .inventory-box {
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.4rem; /* 原料仓库底部外边距缩小到0.4rem */
       }
       .inventory-title {
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.25rem; /* 标题底部外边距缩小到0.25rem */
       }
       .recipes-box {
-        margin-bottom: 0.6rem;
+        margin-bottom: 0.6rem; /* 配方书底部外边距缩小到0.6rem */
+        padding: 0.5rem; /* 配方书内边距缩小到0.5rem */
+      }
+      .recipe-item {
+        padding: 0.35rem; /* 配方项内边距缩小到0.35rem */
+        margin-bottom: 0.35rem; /* 配方项底部外边距缩小到0.35rem */
+        gap: 0.35rem; /* 配方项子元素间距缩小到0.35rem */
+      }
+      .recipe-ing {
+        font-size: 2.2rem; /* 原料图标缩小到2.2rem */
+      }
+      .recipe-arrow {
+        font-size: 1.3rem; /* 箭头缩小到1.3rem */
+      }
+      .recipe-result {
+        font-size: 2.7rem; /* 结果图标缩小到2.7rem */
+      }
+      .recipe-time {
+        font-size: 0.65rem; /* 时间文字缩小到0.65rem */
+      }
+      .crafting-queue {
+        margin-bottom: 0.4rem; /* 制作中队列底部外边距缩小到0.4rem */
       }
     }
 
+    /* ==================== 响应式断点 - 屏幕高度<700px ==================== */
     @media (max-height: 700px) {
       .well-box {
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.3rem; /* 水井底部外边距缩小到0.3rem */
       }
       .inventory-box {
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.3rem; /* 原料仓库底部外边距缩小到0.3rem */
       }
       .inventory-title {
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.2rem; /* 标题底部外边距缩小到0.2rem */
       }
       .recipes-box {
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.5rem; /* 配方书底部外边距缩小到0.5rem */
+        padding: 0.4rem; /* 配方书内边距缩小到0.4rem */
+      }
+      .recipe-item {
+        padding: 0.3rem; /* 配方项内边距缩小到0.3rem */
+        margin-bottom: 0.3rem; /* 配方项底部外边距缩小到0.3rem */
+        gap: 0.3rem; /* 配方项子元素间距缩小到0.3rem */
+      }
+      .recipe-ing {
+        font-size: 2rem; /* 原料图标缩小到2rem */
+      }
+      .recipe-arrow {
+        font-size: 1.2rem; /* 箭头缩小到1.2rem */
+      }
+      .recipe-result {
+        font-size: 2.5rem; /* 结果图标缩小到2.5rem */
+      }
+      .recipe-time {
+        font-size: 0.6rem; /* 时间文字缩小到0.6rem */
+      }
+      .crafting-queue {
+        margin-bottom: 0.3rem; /* 制作中队列底部外边距缩小到0.3rem */
       }
     }
 
+    /* ==================== 响应式断点 - 屏幕高度<600px ==================== */
     @media (max-height: 600px) {
       .well-box {
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.25rem; /* 水井底部外边距缩小到0.25rem */
       }
       .inventory-box {
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.25rem; /* 原料仓库底部外边距缩小到0.25rem */
       }
       .inventory-title {
-        margin-bottom: 0.15rem;
+        margin-bottom: 0.15rem; /* 标题底部外边距缩小到0.15rem */
       }
       .recipes-box {
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.4rem; /* 配方书底部外边距缩小到0.4rem */
+        padding: 0.35rem; /* 配方书内边距缩小到0.35rem */
+      }
+      .recipe-item {
+        padding: 0.25rem; /* 配方项内边距缩小到0.25rem */
+        margin-bottom: 0.25rem; /* 配方项底部外边距缩小到0.25rem */
+        gap: 0.25rem; /* 配方项子元素间距缩小到0.25rem */
+      }
+      .recipe-ing {
+        font-size: 1.8rem; /* 原料图标缩小到1.8rem */
+      }
+      .recipe-arrow {
+        font-size: 1.1rem; /* 箭头缩小到1.1rem */
+      }
+      .recipe-result {
+        font-size: 2.3rem; /* 结果图标缩小到2.3rem */
+      }
+      .recipe-time {
+        font-size: 0.55rem; /* 时间文字缩小到0.55rem */
+      }
+      .crafting-queue {
+        margin-bottom: 0.25rem; /* 制作中队列底部外边距缩小到0.25rem */
       }
     }
 
+    /* ==================== 响应式断点 - 屏幕高度<500px ==================== */
     @media (max-height: 500px) {
       .well-box {
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.2rem; /* 水井底部外边距缩小到0.2rem */
       }
       .inventory-box {
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.2rem; /* 原料仓库底部外边距缩小到0.2rem */
       }
       .inventory-title {
-        margin-bottom: 0.1rem;
+        margin-bottom: 0.1rem; /* 标题底部外边距缩小到0.1rem */
       }
       .recipes-box {
-        margin-bottom: 0.3rem;
+        margin-bottom: 0.3rem; /* 配方书底部外边距缩小到0.3rem */
+        padding: 0.3rem; /* 配方书内边距缩小到0.3rem */
+      }
+      .recipe-item {
+        padding: 0.2rem; /* 配方项内边距缩小到0.2rem */
+        margin-bottom: 0.2rem; /* 配方项底部外边距缩小到0.2rem */
+        gap: 0.2rem; /* 配方项子元素间距缩小到0.2rem */
+      }
+      .recipe-ing {
+        font-size: 1.6rem; /* 原料图标缩小到1.6rem */
+      }
+      .recipe-arrow {
+        font-size: 1rem; /* 箭头缩小到1rem */
+      }
+      .recipe-result {
+        font-size: 2.1rem; /* 结果图标缩小到2.1rem */
+      }
+      .recipe-time {
+        font-size: 0.5rem; /* 时间文字缩小到0.5rem */
+      }
+      .crafting-queue {
+        margin-bottom: 0.2rem; /* 制作中队列底部外边距缩小到0.2rem */
       }
     }
   </style>
@@ -1237,7 +1599,7 @@
     <!-- 制作区 -->
     <div class="kitchen">
       <div class="section-title">👨‍🍳 制作区</div>
-      
+
       <!-- 水井 -->
       <div class="well-box">
         <div class="well-title">🚰 水井</div>
@@ -1246,32 +1608,33 @@
           <div class="well-progress-fill" id="well-progress-fill" style="width: 0%"></div>
         </div>
       </div>
-      
-      <div class="inventory-box">
-        <div class="inventory-title">📦 原料仓库</div>
-        <div class="inventory-items" id="inventory-items">
-          <div style="color: #999; font-size: 0.7rem;">去打水或购买</div>
-        </div>
-      </div>
-      
+
       <div class="recipes-box">
         <div class="inventory-title">📖 配方书（点击制作）</div>
         <div id="recipes-list">
           <!-- 配方动态生成 -->
         </div>
       </div>
-      
+    </div>
+
+    <!-- 材料区 -->
+    <div class="market">
+      <div class="section-title">🏪 材料区</div>
+
+      <div class="inventory-box">
+        <div class="inventory-title">📦 原料仓库</div>
+        <div class="inventory-items" id="inventory-items">
+          <div style="color: #999; font-size: 0.7rem;">去打水或购买</div>
+        </div>
+      </div>
+
       <div class="crafting-queue">
         <div class="inventory-title">⏳ 制作中</div>
         <div id="crafting-list">
           <div style="color: #999; font-size: 0.75rem;">暂无制作中的物品</div>
         </div>
       </div>
-    </div>
 
-    <!-- 市场区 -->
-    <div class="market">
-      <div class="section-title">🏪 材料区</div>
       <div class="selection-hint">花钱购买原料，省时省力</div>
       <div class="market-items" id="market-items">
         <!-- 市场物品动态生成 -->
@@ -1346,33 +1709,61 @@
   <script>
     // ==================== 游戏配置 ====================
     // ========== 多用户多关卡存档功能 ==========
+
+    /**
+     * 保存游戏进度（带用户名）
+     * 功能：弹出用户名输入框，将当前游戏状态保存到localStorage
+     * 存档内容：用户名、保存时间、当前关卡数、完整游戏状态
+     */
     function saveGameWithUser() {
-      // 弹出自定义用户名输入框
+      // 弹出自定义用户名输入框，等待用户输入
       showUsernameModal(function(username) {
+        // 如果用户未输入用户名或点击取消，则终止存档
         if (!username) { showToast('未输入用户名，存档取消'); return; }
+
+        // 将用户名保存到localStorage，作为"上次使用的用户名"，下次存档时自动填充
         localStorage.setItem('bakery_last_user', username);
+
+        // 获取当前时间并格式化为本地时间字符串（如：2026/2/15 下午3:45:30）
         const now = new Date();
         const saveTime = now.toLocaleString();
+
+        // 构建存档对象，包含所有需要保存的信息
         const saveObj = {
-          username,
-          time: saveTime,
-          round: state.round,
-          state: JSON.parse(JSON.stringify(state))
+          username,                                      // 用户名
+          time: saveTime,                                // 存档时间
+          round: state.round,                            // 当前关卡数
+          state: JSON.parse(JSON.stringify(state))       // 深拷贝游戏状态，避免引用问题
         };
-        // 追加到存档列表
+
+        // 从localStorage读取现有存档列表（如果不存在则初始化为空数组）
         let saves = [];
         try { saves = JSON.parse(localStorage.getItem('bakery_saves')||'[]'); } catch {}
+
+        // 将新存档追加到存档列表末尾
         saves.push(saveObj);
+
+        // 将更新后的存档列表保存回localStorage
         localStorage.setItem('bakery_saves', JSON.stringify(saves));
+
+        // 显示存档成功提示
         showToast('存档成功！用户名：' + username + '，第' + state.round + '关');
       });
     }
 
-    // 美观的用户名输入模态框
+    /**
+     * 显示用户名输入模态框
+     * @param {Function} onSubmit - 回调函数，用户点击确定或取消后调用，参数为用户名（取消时为null）
+     * 功能：创建一个美观的模态框，让用户输入用户名
+     */
     function showUsernameModal(onSubmit) {
+      // 从localStorage读取上次使用的用户名，如果不存在则为空字符串
       let lastUser = localStorage.getItem('bakery_last_user') || '';
-      // 避免重复弹出
+
+      // 避免重复弹出：如果模态框已存在，则直接返回
       if (document.getElementById('username-modal-bg')) return;
+
+      // 构建模态框HTML结构
       let html = `<div class="modal-overlay active" id="username-modal-bg" style="z-index:2001;">
         <div class="modal">
           <div class="modal-title">请输入用户名</div>
@@ -1385,451 +1776,795 @@
           </div>
         </div>
       </div>`;
+      // 内联样式说明：
+      // z-index:2001 - 层级设为2001，确保在其他弹窗之上
+      // width:80% - 输入框宽度占父容器的80%
+      // padding:0.5rem 0.75rem - 输入框内边距：上下0.5rem，左右0.75rem
+      // font-size:1rem - 输入框字体大小1rem
+      // border-radius:0.5rem - 输入框圆角半径0.5rem
+      // border:0.06rem solid #DEB887 - 边框宽度0.06rem，颜色为浅棕色
+      // maxlength="16" - 用户名最大长度限制为16个字符
+      // margin-top:0.6rem - 按钮区域顶部外边距0.6rem
+      // margin-left:0.75rem - 取消按钮左侧外边距0.75rem
+
+      // 创建DOM元素并插入到页面
       const modal = document.createElement('div');
       modal.innerHTML = html;
       document.body.appendChild(modal);
-      // 事件绑定
+
+      // 事件绑定：延迟100毫秒后自动聚焦到输入框，方便用户直接输入
       setTimeout(()=>{
         document.getElementById('username-input').focus();
       }, 100);
+
+      // 绑定"确定"按钮点击事件
       document.getElementById('username-ok-btn').onclick = function() {
+        // 获取输入框的值并去除首尾空格
         const val = document.getElementById('username-input').value.trim();
+        // 关闭模态框
         closeUsernameModal();
+        // 调用回调函数，传入用户名
         onSubmit(val);
       };
+
+      // 绑定"取消"按钮点击事件
       document.getElementById('username-cancel-btn').onclick = function() {
+        // 关闭模态框
         closeUsernameModal();
+        // 调用回调函数，传入null表示取消
         onSubmit(null);
       };
+
+      // 绑定输入框回车键事件：按回车等同于点击确定按钮
       document.getElementById('username-input').onkeydown = function(e) {
         if (e.key === 'Enter') document.getElementById('username-ok-btn').click();
       };
+
+      // 定义关闭模态框的全局函数
       window.closeUsernameModal = function() {
+        // 从DOM中移除模态框元素
         if (modal && modal.parentNode) modal.parentNode.removeChild(modal);
       };
     }
 
+    /**
+     * 显示读档对话框
+     * 功能：从localStorage读取所有存档，以表格形式展示，让用户选择要读取的存档
+     */
     function showLoadDialog() {
+      // 从localStorage读取存档列表
       let saves = [];
       try { saves = JSON.parse(localStorage.getItem('bakery_saves')||'[]'); } catch {}
+
+      // 如果没有存档，显示提示并返回
       if (!saves.length) { showToast('没有可用存档'); return; }
-      // 构建选择框
+
+      // 构建读档对话框HTML结构
       let html = '<div id="load-modal-bg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;display:flex;align-items:center;justify-content:center;">';
+      // 内联样式说明：
+      // position:fixed - 固定定位，相对于浏览器窗口
+      // top:0;left:0 - 从左上角开始
+      // width:100vw;height:100vh - 宽高占满整个视口
+      // background:rgba(0,0,0,0.5) - 半透明黑色背景（透明度50%）
+      // z-index:2000 - 层级2000，确保在游戏界面之上
+      // display:flex;align-items:center;justify-content:center - 使用flex布局，内容居中
+
       html += '<div style="background:#fff;padding:1.5rem 1.1rem;border-radius:1rem;min-width:16rem;max-width:90vw;max-height:80vh;overflow:auto;">';
+      // 内联样式说明：
+      // background:#fff - 白色背景
+      // padding:1.5rem 1.1rem - 内边距：上下1.5rem，左右1.1rem
+      // border-radius:1rem - 圆角半径1rem
+      // min-width:16rem - 最小宽度16rem
+      // max-width:90vw - 最大宽度为视口宽度的90%
+      // max-height:80vh - 最大高度为视口高度的80%
+      // overflow:auto - 内容超出时显示滚动条
+
       html += '<div style="font-size:1.1rem;font-weight:bold;color:#8B4513;margin-bottom:0.6rem;">选择存档</div>';
+      // 标题样式：字体大小1.1rem，加粗，棕色，底部外边距0.6rem
+
       html += '<table style="width:100%;font-size:0.85rem;margin-bottom:0.6rem;">';
+      // 表格样式：宽度100%，字体大小0.85rem，底部外边距0.6rem
+
       html += '<tr><th>用户名</th><th>关卡</th><th>时间</th><th></th></tr>';
+      // 表头：用户名、关卡、时间、操作列
+
+      // 遍历所有存档，生成表格行
       saves.forEach((s, i) => {
         html += `<tr><td>${s.username}</td><td>${s.round}</td><td>${s.time}</td><td><button onclick="loadGameFromList(${i})" style='padding:0.12rem 0.5rem;border-radius:0.4rem;background:#90EE90;color:#2E8B57;border:none;cursor:pointer;font-size:0.75rem;'>读档</button></td></tr>`;
+        // 按钮样式说明：
+        // padding:0.12rem 0.5rem - 内边距：上下0.12rem，左右0.5rem
+        // border-radius:0.4rem - 圆角半径0.4rem
+        // background:#90EE90 - 浅绿色背景
+        // color:#2E8B57 - 深绿色文字
+        // font-size:0.75rem - 字体大小0.75rem
       });
+
       html += '</table>';
       html += '<button onclick="closeLoadModal()" style="padding:0.4rem 1.1rem;border-radius:0.5rem;background:#ccc;color:#333;border:none;cursor:pointer;font-size:0.85rem;">取消</button>';
+      // 取消按钮样式：内边距0.4rem 1.1rem，圆角0.5rem，灰色背景，字体0.85rem
+
       html += '</div></div>';
+
+      // 创建DOM元素并插入到页面
       const modal = document.createElement('div');
       modal.innerHTML = html;
       document.body.appendChild(modal);
+
+      // 定义关闭读档对话框的全局函数
       window.closeLoadModal = function() { document.body.removeChild(modal); };
     }
 
+    /**
+     * 从存档列表中读取指定存档
+     * @param {number} idx - 存档在列表中的索引（从0开始）
+     * 功能：读取指定索引的存档，恢复游戏状态到该关卡的初始状态
+     */
     function loadGameFromList(idx) {
+      // 从localStorage读取存档列表
       let saves = [];
       try { saves = JSON.parse(localStorage.getItem('bakery_saves')||'[]'); } catch {}
+
+      // 检查存档是否存在
       if (!saves[idx]) { showToast('存档不存在'); return; }
+
+      // 获取指定索引的存档
       const save = saves[idx];
-      // 恢复到该关卡未开始状态
+
+      // 恢复到该关卡未开始状态（保留永久升级和金币，重置本局状态）
       restoreGameToRoundStart(save.state, save.round);
+
+      // 关闭读档对话框
       closeLoadModal();
+
+      // 显示读档成功提示
       showToast('已读档：' + save.username + ' 第' + save.round + '关');
     }
+
+    // 将函数暴露到全局作用域，供HTML onclick调用
     window.showLoadDialog = showLoadDialog;
     window.loadGameFromList = loadGameFromList;
 
+    /**
+     * 恢复游戏到指定关卡的初始状态
+     * @param {Object} savedState - 保存的游戏状态对象
+     * @param {number} round - 要恢复到的关卡数
+     * 功能：只恢复永久升级、金币、关卡数，重置本局状态（作物、库存、制作队列等）
+     */
     function restoreGameToRoundStart(savedState, round) {
-      // 只恢复永久升级、金币、关卡数，重置本局状态
+      // 恢复金币数量
       state.gold = savedState.gold;
+
+      // 恢复关卡数
       state.round = round;
+
+      // 深拷贝恢复永久升级数据（生长速度、制作速度、水井速度、已解锁作物）
       state.permanent = JSON.parse(JSON.stringify(savedState.permanent));
+
       // 重置本局状态
-      state.time = 300;
-      state.isPlaying = true;
-      state.crops = [];
-      state.inventory = {};
-      state.crafting = [];
-      state.counter = {};
-      state.customers = [];
-      state.well = { fetching: false, finishTime: 0 };
-      state.selectedSeed = null;
-      state.selectedIngredient = null;
-      state.selectedBread = null;
-      state.stats = { breadsSold: 0, goldEarned: 0 };
+      state.time = 300;                                    // 重置时间为300秒（5分钟）
+      state.isPlaying = true;                              // 设置游戏为进行中状态
+      state.crops = [];                                    // 清空农田作物数组
+      state.inventory = {};                                // 清空库存对象
+      state.crafting = [];                                 // 清空制作队列数组
+      state.counter = {};                                  // 清空柜台面包对象
+      state.customers = [];                                // 清空顾客数组
+      state.well = { fetching: false, finishTime: 0 };     // 重置水井状态：未在打水，完成时间为0
+      state.selectedSeed = null;                           // 清空选中的种子
+      state.selectedIngredient = null;                     // 清空选中的原料
+      state.selectedBread = null;                          // 清空选中的面包
+      state.stats = { breadsSold: 0, goldEarned: 0 };      // 重置本局统计：售出面包数0，赚取金币数0
+
+      // 更新UI显示
       updateUI();
+
+      // 更新计时器显示
       updateTimer();
+
+      // 启动游戏循环
       startGameLoop();
     }
 
-    // 页面加载时自动从最新存档恢复
+    /**
+     * 页面加载时自动从最新存档恢复
+     * 功能：在页面加载时，自动读取最后一个存档并恢复游戏状态
+     */
     function tryAutoLoad() {
+      // 从localStorage读取存档列表
       let saves = [];
       try { saves = JSON.parse(localStorage.getItem('bakery_saves')||'[]'); } catch {}
+
+      // 如果存在存档，则自动加载最后一个存档
       if (saves.length) {
-        const save = saves[saves.length-1];
+        const save = saves[saves.length-1];  // 获取数组最后一个元素（最新存档）
         restoreGameToRoundStart(save.state, save.round);
         showToast('已自动加载上次存档：' + save.username + ' 第' + save.round + '关');
       }
     }
+
+    // ==================== 游戏数据配置 ====================
+
+    /**
+     * 作物数据配置
+     * 每种作物包含：名称、表情符号、生长时间（秒）、产出物品、产出数量
+     */
     const CROP_DATA = {
       wheat: { name: '小麦', emoji: '🌾', growTime: 5, output: 'flour', outputCount: 2 },
+      // 小麦：生长时间5秒，产出2个面粉
       cow: { name: '奶牛', emoji: '🐄', growTime: 10, output: 'milk', outputCount: 1 },
+      // 奶牛：生长时间10秒，产出1个牛奶
       sugarcane: { name: '甘蔗', emoji: '🎋', growTime: 8, output: 'sugar', outputCount: 1 },
+      // 甘蔗：生长时间8秒，产出1个糖
       chicken: { name: '母鸡', emoji: '🐔', growTime: 12, output: 'egg', outputCount: 1 }
+      // 母鸡：生长时间12秒，产出1个鸡蛋
     };
 
+    /**
+     * 物品数据配置
+     * 每种物品包含：名称、表情符号、价格（如果是成品面包）
+     */
     const ITEM_DATA = {
+      // 原料类物品（无价格）
       flour: { name: '面粉', emoji: '🌾' },
       milk: { name: '牛奶', emoji: '🥛' },
       sugar: { name: '糖', emoji: '🍬' },
       egg: { name: '鸡蛋', emoji: '🥚' },
       water: { name: '水', emoji: '💧' },
+
+      // 中间产物（无价格）
       dough: { name: '面团', emoji: '🥟' },
       butter_dough: { name: '黄油面团', emoji: '🧈' },
       cake_batter: { name: '蛋糕糊', emoji: '🥣' },
+
+      // 成品面包（有价格，可出售）
       white_bread: { name: '白面包', emoji: '🍞', price: 20 },
+      // 白面包售价：20金币
       butter_bread: { name: '黄油面包', emoji: '🥐', price: 50 },
+      // 黄油面包售价：50金币
       sweet_bread: { name: '甜面包', emoji: '🥖', price: 80 },
+      // 甜面包售价：80金币
       cake: { name: '蛋糕', emoji: '🍰', price: 150 }
+      // 蛋糕售价：150金币
     };
 
+    /**
+     * 配方数据配置
+     * 每个配方包含：ID、名称、所需原料数组、制作时间（秒）、产出物品
+     */
     const RECIPES = [
       { id: 'dough', name: '面团', ingredients: ['flour', 'water'], time: 1, output: 'dough' },
+      // 面团配方：需要面粉+水，制作时间1秒，产出面团
+
       { id: 'white_bread', name: '白面包', ingredients: ['dough'], time: 2, output: 'white_bread' },
+      // 白面包配方：需要面团，制作时间2秒，产出白面包
+
       { id: 'butter_dough', name: '黄油面团', ingredients: ['dough', 'milk'], time: 2, output: 'butter_dough' },
+      // 黄油面团配方：需要面团+牛奶，制作时间2秒，产出黄油面团
+
       { id: 'butter_bread', name: '黄油面包', ingredients: ['butter_dough'], time: 3, output: 'butter_bread' },
+      // 黄油面包配方：需要黄油面团，制作时间3秒，产出黄油面包
+
       { id: 'cake_batter', name: '蛋糕糊', ingredients: ['dough', 'sugar', 'egg'], time: 3, output: 'cake_batter' },
+      // 蛋糕糊配方：需要面团+糖+鸡蛋，制作时间3秒，产出蛋糕糊
+
       { id: 'cake', name: '蛋糕', ingredients: ['cake_batter'], time: 5, output: 'cake' }
+      // 蛋糕配方：需要蛋糕糊，制作时间5秒，产出蛋糕
     ];
 
+    /**
+     * 市场物品配置
+     * 每个物品包含：ID、名称、表情符号、购买价格（金币）、描述
+     */
     const MARKET_ITEMS = [
       { id: 'flour', name: '面粉', emoji: '🌾', price: 5, desc: '制作面团必备' },
+      // 面粉：购买价格5金币
+
       { id: 'water', name: '水', emoji: '💧', price: 3, desc: '制作面团必备' },
+      // 水：购买价格3金币（也可以免费打水获得）
+
       { id: 'milk', name: '牛奶', emoji: '🥛', price: 10, desc: '制作黄油面包' },
+      // 牛奶：购买价格10金币
+
       { id: 'sugar', name: '糖', emoji: '🍬', price: 8, desc: '制作蛋糕' },
+      // 糖：购买价格8金币
+
       { id: 'egg', name: '鸡蛋', emoji: '🥚', price: 12, desc: '制作蛋糕' }
+      // 鸡蛋：购买价格12金币
     ];
 
+    /**
+     * 升级商店配置
+     * 每个升级包含：ID、名称、表情符号、描述、价格（金币）、效果函数
+     */
     const UPGRADES = [
       { id: 'grow_speed', name: '生长加速', emoji: '⚡', desc: '所有作物生长时间-20%', price: 1000, effect: () => { state.permanent.growSpeed *= 0.8; } },
+      // 生长加速：价格1000金币，效果是将生长速度系数乘以0.8（即时间减少20%）
+
       { id: 'craft_speed', name: '制作加速', emoji: '🔥', desc: '制作时间-20%', price: 1500, effect: () => { state.permanent.craftSpeed *= 0.8; } },
+      // 制作加速：价格1500金币，效果是将制作速度系数乘以0.8（即时间减少20%）
+
       { id: 'well_speed', name: '水井加速', emoji: '🚰', desc: '打水时间-30%', price: 800, effect: () => { state.permanent.wellSpeed *= 0.7; } },
+      // 水井加速：价格800金币，效果是将水井速度系数乘以0.7（即时间减少30%）
+
       { id: 'unlock_cow', name: '解锁奶牛', emoji: '🐄', desc: '局内可种植奶牛', price: 200, effect: () => { state.permanent.unlockedCrops.push('cow'); } },
+      // 解锁奶牛：价格200金币，效果是将'cow'添加到已解锁作物数组
+
       { id: 'unlock_sugarcane', name: '解锁甘蔗', emoji: '🎋', desc: '局内可种植甘蔗', price: 800, effect: () => { state.permanent.unlockedCrops.push('sugarcane'); } },
+      // 解锁甘蔗：价格800金币，效果是将'sugarcane'添加到已解锁作物数组
+
       { id: 'unlock_chicken', name: '解锁母鸡', emoji: '🐔', desc: '局内可种植母鸡', price: 1500, effect: () => { state.permanent.unlockedCrops.push('chicken'); } }
+      // 解锁母鸡：价格1500金币，效果是将'chicken'添加到已解锁作物数组
     ];
 
+    /**
+     * 顾客类型配置
+     * 每种类型包含：表情符号、可能的名字数组
+     * 用于随机生成不同外观和名字的顾客
+     */
     const CUSTOMER_TYPES = [
       { emoji: '👨', names: ['张先生', '李先生', '王先生'] },
+      // 男性顾客：3个可能的名字
+
       { emoji: '👩', names: ['张女士', '李女士', '王女士'] },
+      // 女性顾客：3个可能的名字
+
       { emoji: '👴', names: ['老爷爷', '老大爷'] },
+      // 老年男性顾客：2个可能的名字
+
       { emoji: '👵', names: ['老奶奶', '老大娘'] },
+      // 老年女性顾客：2个可能的名字
+
       { emoji: '👦', names: ['小明', '小刚', '小强'] },
+      // 男孩顾客：3个可能的名字
+
       { emoji: '👧', names: ['小红', '小丽', '小美'] }
+      // 女孩顾客：3个可能的名字
     ];
 
     // ==================== 游戏状态 ====================
+    /**
+     * 游戏主状态对象
+     * 包含所有游戏数据：金币、关卡、时间、永久升级、本局状态等
+     */
     const state = {
-      gold: 100,
-      round: 1,
-      time: 300,
-      isPlaying: false,
-      
-      // 永久升级
+      gold: 100,                    // 初始金币数量：100金币
+      round: 1,                     // 初始关卡数：第1关
+      time: 300,                    // 每局游戏时间：300秒（5分钟）
+      isPlaying: false,             // 游戏是否正在进行：初始为false
+
+      // 永久升级（跨关卡保留）
       permanent: {
-        growSpeed: 1,
-        craftSpeed: 1,
-        wellSpeed: 1,
+        growSpeed: 1,               // 生长速度系数：1表示正常速度，0.8表示快20%
+        craftSpeed: 1,              // 制作速度系数：1表示正常速度，0.8表示快20%
+        wellSpeed: 1,               // 水井速度系数：1表示正常速度，0.7表示快30%
         unlockedCrops: ['wheat', 'cow', 'sugarcane', 'chicken']
+        // 已解锁的作物列表：初始全部解锁（小麦、奶牛、甘蔗、母鸡）
       },
-      
-      // 本局状态
-      crops: [],
-      inventory: {},
-      crafting: [],
-      counter: {},
-      customers: [],
-      
+
+      // 本局状态（每局重置）
+      crops: [],                    // 农田作物数组：存储9个格子的作物状态
+      inventory: {},                // 库存对象：键为物品ID，值为数量
+      crafting: [],                 // 制作队列数组：存储正在制作的物品
+      counter: {},                  // 柜台面包对象：键为面包ID，值为数量
+      customers: [],                // 顾客数组：存储当前等待的顾客
+
       // 水井状态
       well: {
-        fetching: false,
-        finishTime: 0
+        fetching: false,            // 是否正在打水：false表示未打水
+        finishTime: 0               // 打水完成时间戳：0表示未开始
       },
-      
-      // 选中状态
-      selectedSeed: null,
-      selectedIngredient: null,
-      selectedBread: null,
-      
-      // 统计
+
+      // 选中状态（用于UI交互）
+      selectedSeed: null,           // 选中的种子类型：null表示未选中
+      selectedIngredient: null,     // 选中的原料ID：null表示未选中
+      selectedBread: null,          // 选中的面包ID：null表示未选中
+
+      // 本局统计
       stats: {
-        breadsSold: 0,
-        goldEarned: 0
+        breadsSold: 0,              // 本局售出面包数量：初始为0
+        goldEarned: 0               // 本局赚取金币数量：初始为0
       }
     };
 
     // ==================== 初始化 ====================
+    /**
+     * 游戏初始化函数
+     * 功能：创建农田格子DOM元素，启动新一局游戏
+     */
     function init() {
-      // 初始化农田格子 (9格)
+      // 初始化农田格子（9格3x3布局）
       const farmGrid = document.getElementById('farm-grid');
-      farmGrid.innerHTML = '';
+      farmGrid.innerHTML = '';  // 清空现有内容
+
+      // 循环创建9个农田格子
       for (let i = 0; i < 9; i++) {
         const plot = document.createElement('div');
-        plot.className = 'farm-plot';
-        plot.dataset.index = i;
-        plot.onclick = () => onPlotClick(i);
-        farmGrid.appendChild(plot);
+        plot.className = 'farm-plot';           // 设置CSS类名
+        plot.dataset.index = i;                 // 设置data-index属性，值为0-8
+        plot.onclick = () => onPlotClick(i);    // 绑定点击事件，传入格子索引
+        farmGrid.appendChild(plot);             // 添加到农田网格容器
       }
-      
+
+      // 启动新一局游戏
       startNewRound();
     }
 
+    /**
+     * 开始新一局游戏
+     * 功能：重置本局所有状态，更新UI，启动游戏循环
+     */
     function startNewRound() {
       // 重置本局状态
-      state.time = 300;
-      state.isPlaying = true;
-      state.crops = [];
-      state.inventory = {};
-      state.crafting = [];
-      state.counter = {};
-      state.customers = [];
-      state.well = { fetching: false, finishTime: 0 };
-      state.selectedSeed = null;
-      state.selectedIngredient = null;
-      state.selectedBread = null;
-      state.stats = { breadsSold: 0, goldEarned: 0 };
-      
-      // 更新UI
+      state.time = 300;                                    // 重置时间为300秒（5分钟）
+      state.isPlaying = true;                              // 设置游戏为进行中
+      state.crops = [];                                    // 清空农田作物数组
+      state.inventory = {};                                // 清空库存
+      state.crafting = [];                                 // 清空制作队列
+      state.counter = {};                                  // 清空柜台面包
+      state.customers = [];                                // 清空顾客列表
+      state.well = { fetching: false, finishTime: 0 };     // 重置水井状态
+      state.selectedSeed = null;                           // 清空选中的种子
+      state.selectedIngredient = null;                     // 清空选中的原料
+      state.selectedBread = null;                          // 清空选中的面包
+      state.stats = { breadsSold: 0, goldEarned: 0 };      // 重置本局统计数据
+
+      // 更新UI显示
       updateUI();
-      
-      // 关闭弹窗
+
+      // 关闭所有弹窗
       document.getElementById('game-over-modal').classList.remove('active');
       document.getElementById('upgrade-modal').classList.remove('active');
-      
-      // 开始游戏循环
+
+      // 开始游戏循环（计时器、作物生长、制作等）
       startGameLoop();
-      
+
+      // 显示开始提示
       showToast('第 ' + state.round + ' 局开始！种植小麦→打水→做面团→烤面包！');
     }
 
     // ==================== 游戏循环 ====================
-    let gameInterval;
-    let customerInterval;
-    
+    let gameInterval;           // 主游戏循环定时器（每秒执行一次）
+    let customerInterval;       // 顾客生成定时器（随机间隔生成顾客）
+
+    /**
+     * 启动游戏循环
+     * 功能：启动两个定时器，一个用于游戏主循环（每秒），一个用于生成顾客（随机间隔）
+     */
     function startGameLoop() {
+      // 清除之前的定时器（避免重复启动）
       clearInterval(gameInterval);
       clearInterval(customerInterval);
-      
+
+      // 主游戏循环：每1000毫秒（1秒）执行一次
       gameInterval = setInterval(() => {
+        // 如果游戏未进行，则跳过本次循环
         if (!state.isPlaying) return;
-        
+
+        // 时间减1秒
         state.time--;
+
+        // 如果时间耗尽，结束游戏
         if (state.time <= 0) {
           endGame();
           return;
         }
-        
-        // 更新作物
+
+        // 更新作物生长状态
         updateCrops();
-        
-        // 更新水井
+
+        // 更新水井打水进度
         updateWell();
-        
-        // 更新制作
+
+        // 更新制作队列进度
         updateCrafting();
-        
-        // 更新顾客耐心
+
+        // 更新顾客耐心值
         updateCustomers();
-        
-        // 更新UI
+
+        // 更新计时器显示
         updateTimer();
-      }, 1000);
-      
-      // 顾客生成
+      }, 1000);  // 间隔1000毫秒（1秒）
+
+      // 顾客生成循环：随机间隔3-8秒生成一个顾客
       customerInterval = setInterval(() => {
+        // 如果游戏未进行，则跳过
         if (!state.isPlaying) return;
+
+        // 如果当前顾客数量少于5个，则生成新顾客
         if (state.customers.length < 5) {
           spawnCustomer();
         }
-      }, 3000 + Math.random() * 5000);
+      }, 3000 + Math.random() * 5000);  // 间隔3000-8000毫秒（3-8秒随机）
     }
 
     // ==================== 水井系统 ====================
+    /**
+     * 开始打水
+     * 功能：点击水井按钮后，开始打水倒计时，完成后获得1个水
+     */
     function fetchWater() {
+      // 如果正在打水，则忽略点击
       if (state.well.fetching) return;
-      
+
+      // 计算打水所需时间（秒）：基础3秒 × 水井速度系数
       const fetchTime = Math.floor(3 * state.permanent.wellSpeed);
+
+      // 设置水井状态为打水中
       state.well.fetching = true;
+
+      // 计算打水完成时间戳：当前时间 + 打水时间（毫秒）
       state.well.finishTime = Date.now() + fetchTime * 1000;
-      
+
+      // 禁用打水按钮，防止重复点击
       document.getElementById('well-btn').disabled = true;
+
+      // 更改按钮文字为"打水中..."
       document.getElementById('well-btn').textContent = '打水中...';
+
+      // 显示进度条
       document.getElementById('well-progress').style.display = 'block';
-      
+
+      // 显示提示信息
       showToast('开始打水，需要 ' + fetchTime + ' 秒...');
     }
 
+    /**
+     * 更新水井状态
+     * 功能：每秒调用，更新打水进度条，检查是否完成
+     */
     function updateWell() {
+      // 如果未在打水，则直接返回
       if (!state.well.fetching) return;
-      
+
+      // 获取当前时间戳
       const now = Date.now();
+
+      // 计算打水进度：(当前时间 - 开始时间) / 总时间
+      // 开始时间 = 完成时间 - 总时间（3000毫秒 × 速度系数）
       const progress = (now - (state.well.finishTime - 3000 * state.permanent.wellSpeed)) / (3000 * state.permanent.wellSpeed);
+
+      // 将进度转换为百分比（0-100），最大不超过100
       const percent = Math.min(100, Math.floor(progress * 100));
-      
+
+      // 更新进度条宽度
       document.getElementById('well-progress-fill').style.width = percent + '%';
-      
+
+      // 检查是否完成打水
       if (now >= state.well.finishTime) {
-        // 打水完成
+        // 打水完成，重置水井状态
         state.well.fetching = false;
+
+        // 库存中水的数量+1（如果不存在则初始化为0再+1）
         state.inventory.water = (state.inventory.water || 0) + 1;
-        
+
+        // 恢复打水按钮
         document.getElementById('well-btn').disabled = false;
         document.getElementById('well-btn').textContent = '打水';
+
+        // 隐藏进度条
         document.getElementById('well-progress').style.display = 'none';
+
+        // 重置进度条宽度为0
         document.getElementById('well-progress-fill').style.width = '0%';
-        
+
+        // 更新库存显示
         updateInventory();
+
+        // 更新配方显示（检查是否可制作）
         updateRecipes();
+
+        // 显示获得提示
         showToast('获得 1 个水！');
       }
     }
 
     // ==================== 农田系统 ====================
+    /**
+     * 更新种子选择栏
+     * 功能：根据已解锁的作物，动态生成种子选择按钮
+     */
     function updateSeedsBar() {
       const seedsBar = document.getElementById('seeds-bar');
-      seedsBar.innerHTML = '';
-      
+      seedsBar.innerHTML = '';  // 清空现有内容
+
+      // 遍历所有作物类型
       for (const [type, data] of Object.entries(CROP_DATA)) {
+        // 创建种子项元素
         const seedItem = document.createElement('div');
+
+        // 设置CSS类名：如果当前选中则添加'selected'类
         seedItem.className = 'seed-item' + (state.selectedSeed === type ? ' selected' : '');
-        
+
+        // 检查该作物是否已解锁
         const isUnlocked = state.permanent.unlockedCrops.includes(type);
-        if (!isUnlocked) seedItem.classList.add('locked');
-        
+        if (!isUnlocked) seedItem.classList.add('locked');  // 未解锁则添加'locked'类
+
+        // 设置种子项HTML内容：表情符号、名称、无限符号
         seedItem.innerHTML = `
           <span>${data.emoji}</span>
           <span>${data.name}</span>
           <span class="unlimited">∞</span>
         `;
-        
+
+        // 如果已解锁，绑定点击事件
         if (isUnlocked) {
           seedItem.onclick = () => selectSeed(type);
         }
-        
+
+        // 添加到种子栏
         seedsBar.appendChild(seedItem);
       }
     }
 
+    /**
+     * 选择种子
+     * @param {string} type - 作物类型（wheat/cow/sugarcane/chicken）
+     * 功能：切换选中状态，取消其他选中项
+     */
     function selectSeed(type) {
+      // 如果点击的是已选中的种子，则取消选中；否则选中该种子
       state.selectedSeed = state.selectedSeed === type ? null : type;
+
+      // 取消选中的原料和面包
       state.selectedIngredient = null;
       state.selectedBread = null;
+
+      // 更新种子栏显示
       updateSeedsBar();
+
+      // 显示提示信息
       showToast('已选择 ' + CROP_DATA[type].name + '（无限），点击空地种植');
     }
 
+    /**
+     * 农田格子点击事件处理
+     * @param {number} index - 格子索引（0-8）
+     * 功能：根据格子状态执行收获或种植操作
+     */
     function onPlotClick(index) {
-      const plot = state.crops[index];
-      
-      // 收获
+      const plot = state.crops[index];  // 获取该格子的作物状态
+
+      // 情况1：如果格子有作物且已成熟且未收获，则执行收获
       if (plot && plot.ready && !plot.harvested) {
         harvestCrop(index);
         return;
       }
-      
-      // 种植（无限种子）
+
+      // 情况2：如果格子为空且已选中种子，则执行种植
       if (!plot && state.selectedSeed) {
         plantCrop(index, state.selectedSeed);
       }
     }
 
+    /**
+     * 种植作物
+     * @param {number} index - 格子索引（0-8）
+     * @param {string} type - 作物类型（wheat/cow/sugarcane/chicken）
+     * 功能：在指定格子种植作物，计算成熟时间
+     */
     function plantCrop(index, type) {
-      const data = CROP_DATA[type];
+      const data = CROP_DATA[type];  // 获取作物数据
+
+      // 计算实际生长时间（秒）：基础生长时间 × 生长速度系数
       const growTime = Math.floor(data.growTime * state.permanent.growSpeed);
-      
+
+      // 在指定格子创建作物对象
       state.crops[index] = {
-        type,
-        plantTime: Date.now(),
-        readyTime: Date.now() + growTime * 1000,
-        ready: false,
-        harvested: false
+        type,                                      // 作物类型
+        plantTime: Date.now(),                     // 种植时间戳
+        readyTime: Date.now() + growTime * 1000,   // 成熟时间戳（当前时间 + 生长时间毫秒）
+        ready: false,                              // 是否成熟：初始为false
+        harvested: false                           // 是否已收获：初始为false
       };
-      
+
+      // 取消选中种子
       state.selectedSeed = null;
+
+      // 更新UI显示
       updateSeedsBar();
       updateFarmGrid();
+
+      // 显示提示信息
       showToast('种植了 ' + data.name + '，需要 ' + growTime + ' 秒成熟');
     }
 
+    /**
+     * 收获作物
+     * @param {number} index - 格子索引（0-8）
+     * 功能：收获成熟的作物，将产出物品添加到库存
+     */
     function harvestCrop(index) {
-      const crop = state.crops[index];
-      const data = CROP_DATA[crop.type];
-      
+      const crop = state.crops[index];        // 获取作物对象
+      const data = CROP_DATA[crop.type];      // 获取作物数据
+
+      // 标记为已收获
       crop.harvested = true;
-      
-      // 添加原料到仓库
-      const output = data.output;
+
+      // 添加产出物品到库存
+      const output = data.output;             // 产出物品ID
       state.inventory[output] = (state.inventory[output] || 0) + data.outputCount;
-      
+      // 库存数量增加：如果不存在则初始化为0，然后加上产出数量
+
+      // 更新UI显示
       updateFarmGrid();
       updateInventory();
       updateRecipes();
+
+      // 显示收获提示
       showToast('收获了 ' + data.outputCount + ' 个' + ITEM_DATA[output].name + '！');
-      
-      // 清空格子
+
+      // 延迟300毫秒后清空格子（播放收获动画后）
       setTimeout(() => {
         state.crops[index] = null;
         updateFarmGrid();
       }, 300);
     }
 
+    /**
+     * 更新作物生长状态
+     * 功能：每秒调用，检查所有作物是否成熟
+     */
     function updateCrops() {
-      const now = Date.now();
-      let changed = false;
-      
+      const now = Date.now();  // 获取当前时间戳
+      let changed = false;     // 标记是否有作物状态改变
+
+      // 遍历所有作物
       state.crops.forEach(crop => {
+        // 如果作物存在、未成熟、未收获，且当前时间已达到成熟时间
         if (crop && !crop.ready && !crop.harvested && now >= crop.readyTime) {
-          crop.ready = true;
-          changed = true;
+          crop.ready = true;   // 标记为成熟
+          changed = true;      // 标记有变化
         }
       });
-      
+
+      // 如果有作物状态改变，更新农田显示
       if (changed) updateFarmGrid();
     }
 
+    /**
+     * 更新农田网格显示
+     * 功能：根据作物状态更新每个格子的显示内容（空地、生长中、成熟、已收获）
+     */
     function updateFarmGrid() {
-      const plots = document.querySelectorAll('.farm-plot');
-      
+      const plots = document.querySelectorAll('.farm-plot');  // 获取所有农田格子元素
+
+      // 遍历所有格子
       plots.forEach((plotEl, index) => {
-        const crop = state.crops[index];
-        plotEl.className = 'farm-plot';
-        plotEl.innerHTML = '';
-        
+        const crop = state.crops[index];  // 获取该格子的作物状态
+        plotEl.className = 'farm-plot';   // 重置CSS类名
+        plotEl.innerHTML = '';            // 清空内容
+
+        // 情况1：空地，显示半透明的种子图标
         if (!crop) {
         plotEl.innerHTML = '<span style="font-size:1.5rem;opacity:0.3;">🌱</span>';
+        // 字体大小1.5rem，透明度30%
           return;
         }
-        
-        const data = CROP_DATA[crop.type];
-        
+
+        const data = CROP_DATA[crop.type];  // 获取作物数据
+
+        // 情况2：已收获，显示闪光特效
         if (crop.harvested) {
           plotEl.innerHTML = '<span style="font-size:1.5rem;opacity:0.3;">✨</span>';
-        } else if (crop.ready) {
-          plotEl.classList.add('planted', 'ready');
+          // 字体大小1.5rem，透明度30%
+        }
+        // 情况3：已成熟，显示作物图标和"可收获"提示
+        else if (crop.ready) {
+          plotEl.classList.add('planted', 'ready');  // 添加'planted'和'ready'类
           plotEl.innerHTML = `
             <span class="crop-icon">${data.emoji}</span>
             <span class="plot-status">可收获！</span>
           `;
-        } else {
-          plotEl.classList.add('planted');
+        }
+        // 情况4：生长中，显示进度条和百分比
+        else {
+          plotEl.classList.add('planted');  // 添加'planted'类
+
+          // 计算生长进度：(当前时间 - 种植时间) / (成熟时间 - 种植时间)
           const progress = (Date.now() - crop.plantTime) / (crop.readyTime - crop.plantTime);
+
+          // 转换为百分比（0-100），最大不超过100
           const percent = Math.min(100, Math.floor(progress * 100));
+
           plotEl.innerHTML = `
             <span class="crop-icon">🌱</span>
             <div class="progress-bar">
@@ -1842,16 +2577,23 @@
     }
 
     // ==================== 市场系统 ====================
+    /**
+     * 更新市场物品显示
+     * 功能：根据玩家金币数量，动态生成可购买的物品列表
+     */
     function updateMarket() {
       const marketItems = document.getElementById('market-items');
-      marketItems.innerHTML = '';
-      
+      marketItems.innerHTML = '';  // 清空现有内容
+
+      // 遍历所有市场物品
       MARKET_ITEMS.forEach(item => {
         const itemEl = document.createElement('div');
         itemEl.className = 'market-item';
-        
+
+        // 检查玩家是否有足够金币购买
         const canAfford = state.gold >= item.price;
-        
+
+        // 构建物品HTML：图标、名称、描述、购买按钮
         itemEl.innerHTML = `
           <div class="market-item-icon">${item.emoji}</div>
           <div class="market-item-info">
@@ -1862,175 +2604,260 @@
             💰${item.price}
           </button>
         `;
-        
+        // 如果金币不足，按钮会被禁用（disabled属性）
+
         marketItems.appendChild(itemEl);
       });
     }
 
+    /**
+     * 购买市场物品
+     * @param {string} itemId - 物品ID
+     * 功能：扣除金币，将物品添加到库存
+     */
     function buyItem(itemId) {
+      // 查找物品数据
       const item = MARKET_ITEMS.find(i => i.id === itemId);
+
+      // 检查物品是否存在且金币是否足够
       if (!item || state.gold < item.price) {
         showToast('金币不足！');
         return;
       }
-      
+
+      // 扣除金币
       state.gold -= item.price;
+
+      // 库存中该物品数量+1
       state.inventory[itemId] = (state.inventory[itemId] || 0) + 1;
-      
-      updateHeader();
-      updateMarket();
-      updateInventory();
-      updateRecipes();
+
+      // 更新UI显示
+      updateHeader();      // 更新顶部金币显示
+      updateMarket();      // 更新市场按钮状态
+      updateInventory();   // 更新库存显示
+      updateRecipes();     // 更新配方可制作状态
+
+      // 显示购买提示
       showToast('购买了 1 个' + item.name + '！');
     }
 
     // ==================== 制作系统 ====================
+    /**
+     * 更新库存显示
+     * 功能：显示玩家当前拥有的所有原料和数量
+     */
     function updateInventory() {
       const invItems = document.getElementById('inventory-items');
 
+      // 检查是否有库存物品
       const hasItems = Object.keys(state.inventory).length > 0;
       if (!hasItems) {
+        // 如果没有物品，显示提示文字
         invItems.innerHTML = '<div style="color: #999; font-size: 0.7rem;">去打水或购买</div>';
+        // 灰色文字，字体大小0.7rem
         return;
       }
 
+      // 清空现有内容
       invItems.innerHTML = '';
-      for (const [item, count] of Object.entries(state.inventory)) {
-        if (count <= 0) continue;
 
+      // 遍历所有库存物品
+      for (const [item, count] of Object.entries(state.inventory)) {
+        if (count <= 0) continue;  // 跳过数量为0或负数的物品
+
+        // 创建库存物品元素
         const itemEl = document.createElement('div');
         itemEl.className = 'inv-item';
         itemEl.innerHTML = `
           <span>${ITEM_DATA[item].emoji}</span>
           <span class="count">${count}</span>
         `;
-        itemEl.title = ITEM_DATA[item].name;
+        itemEl.title = ITEM_DATA[item].name;  // 鼠标悬停时显示物品名称
         invItems.appendChild(itemEl);
       }
     }
 
+    /**
+     * 选择原料（未使用的功能）
+     * @param {string} item - 物品ID
+     * 功能：切换选中状态
+     */
     function selectIngredient(item) {
+      // 如果点击的是已选中的原料，则取消选中；否则选中该原料
       state.selectedIngredient = state.selectedIngredient === item ? null : item;
+
+      // 取消其他选中项
       state.selectedSeed = null;
       state.selectedBread = null;
+
+      // 更新UI显示
       updateInventory();
       updateRecipes();
+
+      // 显示提示
       showToast('已选择 ' + ITEM_DATA[item].name);
     }
 
+    /**
+     * 更新配方书显示
+     * 功能：根据库存原料，显示所有配方及其可制作状态
+     */
     function updateRecipes() {
       const recipesList = document.getElementById('recipes-list');
-      recipesList.innerHTML = '';
-      
+      recipesList.innerHTML = '';  // 清空现有内容
+
+      // 遍历所有配方
       RECIPES.forEach(recipe => {
         const recipeEl = document.createElement('div');
-        
-        // 检查是否可以制作
-        const canCraft = recipe.ingredients.every(ing => 
+
+        // 检查是否可以制作：所有原料数量都大于0
+        const canCraft = recipe.ingredients.every(ing =>
           (state.inventory[ing] || 0) > 0
         );
-        
+
+        // 设置CSS类名：如果可制作则添加'can-craft'类
         recipeEl.className = 'recipe-item' + (canCraft ? ' can-craft' : '');
-        
-        const ingHtml = recipe.ingredients.map(ing => 
+
+        // 构建原料图标HTML
+        const ingHtml = recipe.ingredients.map(ing =>
           `<span class="recipe-ing">${ITEM_DATA[ing].emoji}</span>`
         ).join('');
-        
+
+        // 计算实际制作时间（秒）：基础时间 × 制作速度系数
         const time = Math.floor(recipe.time * state.permanent.craftSpeed);
-        
+
+        // 构建配方HTML：原料 → 结果 + 时间
         recipeEl.innerHTML = `
           <div class="recipe-ingredients">${ingHtml}</div>
           <span class="recipe-arrow">→</span>
           <span class="recipe-result">${ITEM_DATA[recipe.output].emoji}</span>
           <span class="recipe-time">${time}秒</span>
         `;
-        
+
+        // 绑定点击事件：点击配方开始制作
         recipeEl.onclick = () => startCrafting(recipe);
         recipesList.appendChild(recipeEl);
       });
     }
 
+    /**
+     * 开始制作物品
+     * @param {Object} recipe - 配方对象
+     * 功能：检查原料，消耗原料，将制作任务加入队列
+     */
     function startCrafting(recipe) {
-      // 检查原料
-      const hasIngredients = recipe.ingredients.every(ing => 
+      // 检查是否有足够的原料
+      const hasIngredients = recipe.ingredients.every(ing =>
         (state.inventory[ing] || 0) > 0
       );
-      
+
+      // 如果原料不足，显示提示并返回
       if (!hasIngredients) {
         showToast('原料不足！');
         return;
       }
-      
-      // 消耗原料
+
+      // 消耗原料：每种原料数量-1
       recipe.ingredients.forEach(ing => {
         state.inventory[ing]--;
+        // 如果数量降到0或以下，从库存中删除该物品
         if (state.inventory[ing] <= 0) delete state.inventory[ing];
       });
-      
-      // 开始制作
+
+      // 计算制作时间（秒）：基础时间 × 制作速度系数
       const craftTime = Math.floor(recipe.time * state.permanent.craftSpeed);
+
+      // 将制作任务添加到制作队列
       state.crafting.push({
-        recipe,
-        startTime: Date.now(),
-        finishTime: Date.now() + craftTime * 1000,
-        finished: false
+        recipe,                                      // 配方对象
+        startTime: Date.now(),                       // 开始时间戳
+        finishTime: Date.now() + craftTime * 1000,   // 完成时间戳（当前时间 + 制作时间毫秒）
+        finished: false                              // 是否完成：初始为false
       });
-      
+
+      // 取消选中的原料
       state.selectedIngredient = null;
+
+      // 更新UI显示
       updateInventory();
       updateRecipes();
       updateCraftingList();
+
+      // 显示开始制作提示
       showToast('开始制作 ' + recipe.name + '...');
     }
 
+    /**
+     * 更新制作队列状态
+     * 功能：每秒调用，检查制作任务是否完成，将产出物品放入柜台或库存
+     */
     function updateCrafting() {
-      const now = Date.now();
-      let changed = false;
-      
+      const now = Date.now();  // 获取当前时间戳
+      let changed = false;     // 标记是否有任务完成
+
+      // 遍历所有制作任务
       state.crafting.forEach(craft => {
+        // 如果任务未完成且当前时间已达到完成时间
         if (!craft.finished && now >= craft.finishTime) {
-          craft.finished = true;
-          
-          // 产出
+          craft.finished = true;  // 标记为已完成
+
+          // 获取产出物品ID
           const output = craft.recipe.output;
+
+          // 判断产出物品类型
           if (['white_bread', 'butter_bread', 'sweet_bread', 'cake'].includes(output)) {
-            // 面包放到柜台
+            // 如果是成品面包，放到柜台
             state.counter[output] = (state.counter[output] || 0) + 1;
             updateCounter();
           } else {
-            // 半成品放到仓库
+            // 如果是半成品（面团、黄油面团、蛋糕糊），放到库存
             state.inventory[output] = (state.inventory[output] || 0) + 1;
             updateInventory();
           }
-          
-          changed = true;
+
+          changed = true;  // 标记有变化
           showToast(ITEM_DATA[output].name + ' 制作完成！');
         }
       });
-      
-      // 清理已完成的
+
+      // 清理已完成的任务：过滤掉finished为true的任务
       state.crafting = state.crafting.filter(c => !c.finished);
+
+      // 如果有任务完成或队列为空，更新制作列表显示
       if (changed || state.crafting.length === 0) {
         updateCraftingList();
       }
     }
 
+    /**
+     * 更新制作队列显示
+     * 功能：显示所有正在制作的物品及其进度条
+     */
     function updateCraftingList() {
       const craftingList = document.getElementById('crafting-list');
-      
+
+      // 如果没有正在制作的物品，显示提示文字
       if (state.crafting.length === 0) {
         craftingList.innerHTML = '<div style="color: #999; font-size: 0.75rem;">暂无制作中的物品</div>';
+        // 灰色文字，字体大小0.75rem
         return;
       }
-      
+
+      // 清空现有内容
       craftingList.innerHTML = '';
-      const now = Date.now();
-      
+      const now = Date.now();  // 获取当前时间戳
+
+      // 遍历所有制作任务
       state.crafting.forEach(craft => {
         const recipe = craft.recipe;
+
+        // 计算制作进度：(当前时间 - 开始时间) / (完成时间 - 开始时间)
         const progress = (now - craft.startTime) / (craft.finishTime - craft.startTime);
+
+        // 转换为百分比（0-100），最大不超过100
         const percent = Math.min(100, Math.floor(progress * 100));
-        
+
+        // 创建制作项元素
         const craftEl = document.createElement('div');
         craftEl.className = 'crafting-item';
         craftEl.innerHTML = `
@@ -2040,98 +2867,163 @@
           </div>
           <span style="font-size:0.7rem;color:#666;">${percent}%</span>
         `;
+        // 物品图标字体大小1.25rem，百分比文字大小0.7rem，颜色为灰色
+
         craftingList.appendChild(craftEl);
       });
     }
 
     // ==================== 售卖系统 ====================
+    /**
+     * 更新柜台面包显示
+     * 功能：显示所有已制作完成的面包及其价格和数量
+     */
     function updateCounter() {
       const counterItems = document.getElementById('counter-items');
-      
+
+      // 检查是否有面包
       const hasBreads = Object.keys(state.counter).length > 0;
       if (!hasBreads) {
+        // 如果没有面包，显示提示文字
         counterItems.innerHTML = '<div style="color: #999; font-size: 0.75rem; width: 100%; text-align: center;">暂无面包，快去制作吧！</div>';
+        // 灰色文字，字体大小0.75rem，宽度100%，居中对齐
         return;
       }
-      
+
+      // 清空现有内容
       counterItems.innerHTML = '';
+
+      // 遍历所有柜台面包
       for (const [bread, count] of Object.entries(state.counter)) {
-        if (count <= 0) continue;
-        
+        if (count <= 0) continue;  // 跳过数量为0或负数的面包
+
+        // 创建面包项元素
         const itemEl = document.createElement('div');
+
+        // 设置CSS类名：如果当前选中则添加'selected'类
         itemEl.className = 'counter-item' + (state.selectedBread === bread ? ' selected' : '');
+
+        // 构建面包HTML：图标、价格、数量
         itemEl.innerHTML = `
           <span class="bread-icon">${ITEM_DATA[bread].emoji}</span>
           <span class="bread-price">💰${ITEM_DATA[bread].price}</span>
           <span class="count">${count}</span>
         `;
+
+        // 绑定点击事件：点击选中面包
         itemEl.onclick = () => selectBread(bread);
         counterItems.appendChild(itemEl);
       }
     }
 
+    /**
+     * 选择面包
+     * @param {string} bread - 面包ID
+     * 功能：切换选中状态，准备出售给顾客
+     */
     function selectBread(bread) {
+      // 如果点击的是已选中的面包，则取消选中；否则选中该面包
       state.selectedBread = state.selectedBread === bread ? null : bread;
+
+      // 取消其他选中项
       state.selectedSeed = null;
       state.selectedIngredient = null;
+
+      // 更新柜台显示
       updateCounter();
+
+      // 显示提示
       showToast('已选择 ' + ITEM_DATA[bread].name + '，点击顾客出售');
     }
 
+    /**
+     * 生成新顾客
+     * 功能：随机生成一个顾客，包括外观、名字、需求、耐心值
+     */
     function spawnCustomer() {
-      const types = CUSTOMER_TYPES;
+      const types = CUSTOMER_TYPES;  // 获取顾客类型列表
+
+      // 随机选择一个顾客类型
       const type = types[Math.floor(Math.random() * types.length)];
+
+      // 从该类型的名字列表中随机选择一个名字
       const name = type.names[Math.floor(Math.random() * type.names.length)];
-      
-      // 根据进度决定需求
-      let possibleWants = ['white_bread'];
+
+      // 根据已解锁的作物决定顾客可能需求的面包类型
+      let possibleWants = ['white_bread'];  // 白面包始终可用
       if (state.permanent.unlockedCrops.includes('cow')) possibleWants.push('butter_bread');
+      // 如果解锁了奶牛，添加黄油面包
       if (state.permanent.unlockedCrops.includes('sugarcane')) possibleWants.push('sweet_bread');
+      // 如果解锁了甘蔗，添加甜面包
       if (state.permanent.unlockedCrops.includes('chicken')) possibleWants.push('cake');
-      
+      // 如果解锁了母鸡，添加蛋糕
+
+      // 从可能的需求中随机选择一个
       const want = possibleWants[Math.floor(Math.random() * possibleWants.length)];
-      
+
+      // 创建顾客对象
       const customer = {
-        id: Date.now() + Math.random(),
-        emoji: type.emoji,
-        name,
-        want,
-        patience: 30
+        id: Date.now() + Math.random(),  // 唯一ID：当前时间戳 + 随机数
+        emoji: type.emoji,               // 顾客表情符号
+        name,                            // 顾客名字
+        want,                            // 需求的面包类型
+        patience: 30                     // 耐心值：30秒
       };
-      
+
+      // 将顾客添加到顾客列表
       state.customers.push(customer);
+
+      // 更新顾客列表显示
       updateCustomersList();
     }
 
+    /**
+     * 更新顾客状态
+     * 功能：每秒调用，所有顾客耐心值-1，移除耐心耗尽的顾客
+     */
     function updateCustomers() {
-      let changed = false;
-      
+      let changed = false;  // 标记是否有顾客离开
+
+      // 过滤顾客列表：耐心值-1，移除耐心值<=0的顾客
       state.customers = state.customers.filter(c => {
-        c.patience--;
-        if (c.patience <= 0) changed = true;
-        return c.patience > 0;
+        c.patience--;  // 耐心值减1
+        if (c.patience <= 0) changed = true;  // 如果耐心耗尽，标记有变化
+        return c.patience > 0;  // 只保留耐心值>0的顾客
       });
-      
+
+      // 如果有顾客离开，更新顾客列表显示
       if (changed) updateCustomersList();
     }
 
+    /**
+     * 更新顾客列表显示
+     * 功能：显示所有等待的顾客及其需求、耐心值
+     */
     function updateCustomersList() {
       const customersList = document.getElementById('customers-list');
-      
+
+      // 如果没有顾客，显示提示文字
       if (state.customers.length === 0) {
         customersList.innerHTML = '<div style="color: #999; font-size: 0.75rem; text-align: center; padding: 0.9rem;">等待顾客光临...</div>';
+        // 灰色文字，字体大小0.75rem，居中对齐，内边距0.9rem
         return;
       }
-      
+
+      // 清空现有内容
       customersList.innerHTML = '';
-      
+
+      // 遍历所有顾客
       state.customers.forEach(customer => {
         const customerEl = document.createElement('div');
         customerEl.className = 'customer';
-        
+
+        // 获取顾客需求的物品数据
         const wantItem = ITEM_DATA[customer.want];
+
+        // 检查柜台是否有该面包
         const hasBread = (state.counter[customer.want] || 0) > 0;
-        
+
+        // 构建顾客HTML：头像、名字、需求、耐心值
         customerEl.innerHTML = `
           <div class="customer-avatar">${customer.emoji}</div>
           <div class="customer-info">
@@ -2145,107 +3037,161 @@
             ${hasBread ? '出售' : '缺货'}
           </button>
         `;
-        
+        // 价格文字颜色为棕色(#8B4513)，加粗显示
+        // 如果柜台没有该面包，按钮会被禁用，显示"缺货"
+
         customersList.appendChild(customerEl);
       });
     }
 
+    /**
+     * 出售面包给顾客
+     * @param {string|number} customerId - 顾客ID
+     * 功能：将面包卖给顾客，获得金币，移除顾客
+     */
     function sellBread(customerId) {
+      // 查找顾客
       const customer = state.customers.find(c => c.id == customerId);
-      if (!customer) return;
-      
+      if (!customer) return;  // 如果顾客不存在，直接返回
+
+      // 获取顾客需求的面包类型
       const want = customer.want;
+
+      // 检查柜台是否有该面包
       if ((state.counter[want] || 0) <= 0) {
         showToast('柜台没有 ' + ITEM_DATA[want].name + '！');
         return;
       }
-      
-      // 出售
+
+      // 出售面包：柜台数量-1
       state.counter[want]--;
-      if (state.counter[want] <= 0) delete state.counter[want];
-      
+      if (state.counter[want] <= 0) delete state.counter[want];  // 如果数量为0，删除该项
+
+      // 获得金币
       const price = ITEM_DATA[want].price;
-      state.gold += price;
-      state.stats.goldEarned += price;
-      state.stats.breadsSold++;
-      
-      // 移除顾客
+      state.gold += price;                  // 总金币增加
+      state.stats.goldEarned += price;      // 本局赚取金币增加
+      state.stats.breadsSold++;             // 本局售出面包数量+1
+
+      // 移除顾客：从顾客列表中过滤掉该顾客
       state.customers = state.customers.filter(c => c.id != customerId);
-      
+
+      // 取消选中的面包
       state.selectedBread = null;
+
+      // 更新UI显示
       updateCounter();
       updateCustomersList();
       updateHeader();
       updateMarket();
+
+      // 显示出售提示
       showToast('售出 ' + ITEM_DATA[want].name + '，获得 💰' + price + '！');
     }
 
     // ==================== UI更新 ====================
+    /**
+     * 更新所有UI元素
+     * 功能：调用所有UI更新函数，刷新整个游戏界面
+     */
     function updateUI() {
-      updateHeader();
-      updateSeedsBar();
-      updateFarmGrid();
-      updateInventory();
-      updateRecipes();
-      updateCraftingList();
-      updateMarket();
-      updateCounter();
-      updateCustomersList();
+      updateHeader();          // 更新顶部状态栏（金币、关卡）
+      updateSeedsBar();        // 更新种子选择栏
+      updateFarmGrid();        // 更新农田网格
+      updateInventory();       // 更新库存显示
+      updateRecipes();         // 更新配方书
+      updateCraftingList();    // 更新制作队列
+      updateMarket();          // 更新市场物品
+      updateCounter();         // 更新柜台面包
+      updateCustomersList();   // 更新顾客列表
     }
 
+    /**
+     * 更新顶部状态栏
+     * 功能：更新金币数量和关卡数显示
+     */
     function updateHeader() {
-      document.getElementById('gold-display').textContent = state.gold;
-      document.getElementById('round-display').textContent = state.round;
+      document.getElementById('gold-display').textContent = state.gold;    // 显示当前金币数
+      document.getElementById('round-display').textContent = state.round;  // 显示当前关卡数
     }
 
+    /**
+     * 更新计时器显示
+     * 功能：将剩余秒数转换为"分:秒"格式显示
+     */
     function updateTimer() {
-      const minutes = Math.floor(state.time / 60);
-      const seconds = state.time % 60;
-      document.getElementById('time-display').textContent = 
+      const minutes = Math.floor(state.time / 60);  // 计算分钟数：总秒数 / 60
+      const seconds = state.time % 60;              // 计算秒数：总秒数 % 60
+      document.getElementById('time-display').textContent =
         `${minutes}:${seconds.toString().padStart(2, '0')}`;
+      // 格式化为"分:秒"，秒数不足2位时前面补0（如：5:09）
     }
 
+    /**
+     * 显示提示信息
+     * @param {string} message - 提示文字
+     * 功能：在屏幕上显示临时提示信息，2秒后自动消失
+     */
     function showToast(message) {
       const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2000);
+      toast.textContent = message;       // 设置提示文字
+      toast.classList.add('show');       // 添加'show'类，显示提示框
+      setTimeout(() => toast.classList.remove('show'), 2000);  // 2000毫秒（2秒）后移除'show'类，隐藏提示框
     }
 
     // ==================== 游戏结束 ====================
+    /**
+     * 结束游戏
+     * 功能：停止游戏循环，显示本局统计数据，打开游戏结束弹窗
+     */
     function endGame() {
-      state.isPlaying = false;
-      clearInterval(gameInterval);
-      clearInterval(customerInterval);
-      
-      document.getElementById('round-gold').textContent = state.stats.goldEarned;
-      document.getElementById('round-breads').textContent = state.stats.breadsSold;
-      document.getElementById('total-gold').textContent = state.gold;
-      
+      state.isPlaying = false;           // 设置游戏状态为未进行
+      clearInterval(gameInterval);       // 清除主游戏循环定时器
+      clearInterval(customerInterval);   // 清除顾客生成定时器
+
+      // 更新游戏结束弹窗中的统计数据
+      document.getElementById('round-gold').textContent = state.stats.goldEarned;    // 本局收益
+      document.getElementById('round-breads').textContent = state.stats.breadsSold;  // 售出面包数
+      document.getElementById('total-gold').textContent = state.gold;                // 总金币数
+
+      // 显示游戏结束弹窗
       document.getElementById('game-over-modal').classList.add('active');
     }
 
+    /**
+     * 进入下一局（显示升级商店）
+     * 功能：关闭游戏结束弹窗，打开升级商店弹窗
+     */
     function nextRound() {
-      document.getElementById('game-over-modal').classList.remove('active');
-      document.getElementById('upgrade-modal').classList.add('active');
-      updateUpgradeShop();
+      document.getElementById('game-over-modal').classList.remove('active');  // 关闭游戏结束弹窗
+      document.getElementById('upgrade-modal').classList.add('active');       // 打开升级商店弹窗
+      updateUpgradeShop();  // 更新升级商店显示
     }
-    window.nextRound = nextRound;
+    window.nextRound = nextRound;  // 暴露到全局作用域，供HTML onclick调用
 
+    /**
+     * 更新升级商店显示
+     * 功能：显示所有可购买的升级项，根据金币和解锁状态更新按钮状态
+     */
     function updateUpgradeShop() {
       const shop = document.getElementById('upgrade-shop');
-      shop.innerHTML = '';
-      
+      shop.innerHTML = '';  // 清空现有内容
+
+      // 遍历所有升级项
       UPGRADES.forEach(upgrade => {
         const upgradeEl = document.createElement('div');
         upgradeEl.className = 'upgrade-item';
-        
+
+        // 检查是否有足够金币购买
         const canAfford = state.gold >= upgrade.price;
-        const isUnlocked = 
+
+        // 检查是否已解锁（仅针对作物解锁类升级）
+        const isUnlocked =
           (upgrade.id === 'unlock_cow' && state.permanent.unlockedCrops.includes('cow')) ||
           (upgrade.id === 'unlock_sugarcane' && state.permanent.unlockedCrops.includes('sugarcane')) ||
           (upgrade.id === 'unlock_chicken' && state.permanent.unlockedCrops.includes('chicken'));
-        
+
+        // 构建升级项HTML：图标、名称、描述、购买按钮
         upgradeEl.innerHTML = `
           <div class="upgrade-icon">${upgrade.emoji}</div>
           <div class="upgrade-info">
@@ -2256,33 +3202,69 @@
             ${isUnlocked ? '已解锁' : '💰' + upgrade.price}
           </button>
         `;
-        
+        // 如果金币不足或已解锁，按钮会被禁用
+        // 已解锁的显示"已解锁"，未解锁的显示价格
+
         shop.appendChild(upgradeEl);
       });
     }
 
+    /**
+     * 购买升级
+     * @param {string} upgradeId - 升级项ID
+     * 功能：扣除金币，执行升级效果，更新显示
+     */
     function buyUpgrade(upgradeId) {
+      // 查找升级项
       const upgrade = UPGRADES.find(u => u.id === upgradeId);
+
+      // 检查升级是否存在且金币是否足够
       if (!upgrade || state.gold < upgrade.price) return;
-      
+
+      // 扣除金币
       state.gold -= upgrade.price;
+
+      // 执行升级效果函数（修改永久升级数据）
       upgrade.effect();
-      
-      updateHeader();
-      updateUpgradeShop();
+
+      // 更新UI显示
+      updateHeader();        // 更新顶部金币显示
+      updateUpgradeShop();   // 更新升级商店按钮状态
+
+      // 显示购买提示
       showToast('购买了 ' + upgrade.name + '！');
     }
 
+    /**
+     * 开始下一局游戏
+     * 功能：关卡数+1，启动新一局
+     */
     function startNextRound() {
-      state.round++;
-      startNewRound();
+      state.round++;  // 关卡数+1
+      startNewRound();  // 启动新一局游戏
     }
-    window.startNextRound = startNextRound;
+    window.startNextRound = startNextRound;  // 暴露到全局作用域，供HTML onclick调用
 
     // ==================== 启动游戏 ====================
+    /**
+     * 页面加载完成后自动执行
+     * 功能：初始化游戏
+     */
     window.onload = init;
+
+    /**
+     * 暴露存档函数到全局作用域
+     * 供HTML中的存档按钮调用
+     */
     window.saveGameWithUser = saveGameWithUser;
-    // 自动加载存档
+
+    // 自动加载存档（页面加载时尝试恢复最后一次存档）
+    // tryAutoLoad();  // 注释掉自动加载功能，避免每次刷新都自动加载
+
+    /**
+     * 监听DOM内容加载完成事件
+     * 功能：页面DOM加载完成后，自动尝试加载最后一次存档
+     */
     window.addEventListener('DOMContentLoaded', tryAutoLoad);
   </script>
 </body>
