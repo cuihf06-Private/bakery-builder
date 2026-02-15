@@ -18,10 +18,10 @@
     <platform name="android">
         <allow-intent href="market:*" />
         <preference name="AndroidXEnabled" value="true" />
-        <preference name="Orientation" value="portrait" />
+        <preference name="Orientation" value="landscape" />
     </platform>
     <preference name="Fullscreen" value="false" />
-    <preference name="Orientation" value="portrait" />
+    <preference name="Orientation" value="landscape" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="BackgroundColor" value="0xFFF5DEB3" />
     <preference name="SplashScreenDelay" value="0" />
