@@ -31,6 +31,13 @@ jobs:
       with:
         gradle-version: '8.5'
 
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install Android SDK components
+      run: |
+        sdkmanager "build-tools;33.0.2" "platforms;android-33"
+
     - name: Install Cordova
       run: |
         npm install -g cordova@12
