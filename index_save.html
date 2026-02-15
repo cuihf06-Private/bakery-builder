@@ -478,59 +478,87 @@
     .inventory-box {
       background: #FFF8DC;
       border-radius: 0.6rem;
-      padding: 0.6rem;
-      margin-bottom: 0.75rem;
-      min-height: 4.2rem;
+      padding: 0.4rem 0.6rem;
+      margin-bottom: 0.5rem;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: auto;
     }
 
     .inventory-title {
       font-size: 0.8rem;
       color: #8B4513;
-      margin-bottom: 0.4rem;
       font-weight: bold;
+      flex-shrink: 0;
+      white-space: nowrap;
+      margin-bottom: 0.3rem;
     }
 
     .inventory-items {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.4rem;
+      gap: 0.1rem;
+      align-content: flex-start;
+      width: 100%;
     }
 
     .inv-item {
-      width: 2.6rem;
-      height: 2.6rem;
-      background: white;
-      border-radius: 0.5rem;
+      width: auto;
+      height: auto;
+      padding: 0.05rem;
+      background: transparent;
+      border-radius: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
-      border: 0.12rem solid #DEB887;
-      cursor: pointer;
-      transition: all 0.3s;
+      font-size: 1rem;
+      border: none;
+      cursor: default;
+      transition: none;
       position: relative;
+      flex-shrink: 0;
+    }
+
+    @media (max-height: 800px) {
+      .inv-item {
+        font-size: 0.9rem;
+      }
+      .inv-item .count {
+        font-size: 0.55rem;
+      }
+    }
+
+    @media (max-height: 600px) {
+      .inv-item {
+        font-size: 0.8rem;
+      }
+      .inv-item .count {
+        font-size: 0.5rem;
+      }
     }
 
     .inv-item:hover {
-      transform: scale(1.1);
-      border-color: #8B4513;
+      transform: none;
+      border-color: transparent;
     }
 
     .inv-item.selected {
-      background: #F5DEB3;
-      border-color: #8B4513;
-      box-shadow: 0 0 0.5rem rgba(139, 69, 19, 0.5);
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
     }
 
     .inv-item .count {
       position: absolute;
-      bottom: 0.06rem;
-      right: 0.06rem;
-      background: #8B4513;
-      color: white;
-      font-size: 0.55rem;
-      padding: 0.06rem 0.25rem;
-      border-radius: 0.5rem;
+      bottom: 0;
+      right: 0;
+      background: transparent;
+      color: #8B4513;
+      font-size: 0.6rem;
+      padding: 0;
+      border-radius: 0;
+      font-weight: bold;
     }
 
     .recipes-box {
@@ -1034,29 +1062,44 @@
     .well-box {
       background: #E0F7FA;
       border-radius: 0.6rem;
-      padding: 0.6rem;
-      margin-bottom: 0.75rem;
-      text-align: center;
+      padding: 0.4rem 0.6rem;
+      margin-bottom: 0.5rem;
       border: 0.12rem solid #4DD0E1;
+      flex-shrink: 0;
+      height: 10%;
+      min-height: 10%;
+      max-height: 10%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
     }
 
     .well-title {
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       color: #00838F;
-      margin-bottom: 0.5rem;
       font-weight: bold;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .well-btn {
-      padding: 0.5rem 1.2rem;
+      padding: 0.3rem 0.8rem;
       background: #4DD0E1;
       border: none;
       border-radius: 1.2rem;
       cursor: pointer;
       font-weight: bold;
       color: white;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       transition: all 0.3s;
+      white-space: nowrap;
+      flex-shrink: 0;
+      max-height: 100%;
+      height: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .well-btn:hover {
@@ -1071,12 +1114,21 @@
     }
 
     .well-progress {
+      display: none;
       width: 100%;
-      height: 0.4rem;
+      height: 0.3rem;
       background: #B2EBF2;
       border-radius: 0.18rem;
       overflow: hidden;
-      margin-top: 0.5rem;
+      position: absolute;
+      bottom: 0.2rem;
+      left: 0.6rem;
+      right: 0.6rem;
+      width: calc(100% - 1.2rem);
+    }
+
+    .well-box.fetching .well-progress {
+      display: block;
     }
 
     .well-progress-fill {
@@ -1084,6 +1136,67 @@
       background: #00BCD4;
       border-radius: 0.18rem;
       transition: width 0.3s;
+    }
+
+    /* 屏幕窄时压缩制作区间距 */
+    @media (max-height: 800px) {
+      .well-box {
+        margin-bottom: 0.4rem;
+      }
+      .inventory-box {
+        margin-bottom: 0.4rem;
+      }
+      .inventory-title {
+        margin-bottom: 0.25rem;
+      }
+      .recipes-box {
+        margin-bottom: 0.6rem;
+      }
+    }
+
+    @media (max-height: 700px) {
+      .well-box {
+        margin-bottom: 0.3rem;
+      }
+      .inventory-box {
+        margin-bottom: 0.3rem;
+      }
+      .inventory-title {
+        margin-bottom: 0.2rem;
+      }
+      .recipes-box {
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    @media (max-height: 600px) {
+      .well-box {
+        margin-bottom: 0.25rem;
+      }
+      .inventory-box {
+        margin-bottom: 0.25rem;
+      }
+      .inventory-title {
+        margin-bottom: 0.15rem;
+      }
+      .recipes-box {
+        margin-bottom: 0.4rem;
+      }
+    }
+
+    @media (max-height: 500px) {
+      .well-box {
+        margin-bottom: 0.2rem;
+      }
+      .inventory-box {
+        margin-bottom: 0.2rem;
+      }
+      .inventory-title {
+        margin-bottom: 0.1rem;
+      }
+      .recipes-box {
+        margin-bottom: 0.3rem;
+      }
     }
   </style>
 </head>
@@ -1127,17 +1240,17 @@
       
       <!-- 水井 -->
       <div class="well-box">
-        <div class="well-title">🚰 水井（免费取水）</div>
-        <button class="well-btn" id="well-btn" onclick="fetchWater()">打水</button>
+        <div class="well-title">🚰 水井</div>
+        <button class="well-btn" id="well-btn" onclick="fetchWater()">免费打水</button>
         <div class="well-progress" id="well-progress" style="display:none;">
           <div class="well-progress-fill" id="well-progress-fill" style="width: 0%"></div>
         </div>
       </div>
       
       <div class="inventory-box">
-        <div class="inventory-title">📦 原料仓库（点击选择）</div>
+        <div class="inventory-title">📦 原料仓库</div>
         <div class="inventory-items" id="inventory-items">
-          <div style="color: #999; font-size: 0.75rem;">暂无原料</div>
+          <div style="color: #999; font-size: 0.7rem;">去打水或购买</div>
         </div>
       </div>
       
@@ -1158,7 +1271,7 @@
 
     <!-- 市场区 -->
     <div class="market">
-      <div class="section-title">🏪 市场（购买原料）</div>
+      <div class="section-title">🏪 材料区</div>
       <div class="selection-hint">花钱购买原料，省时省力</div>
       <div class="market-items" id="market-items">
         <!-- 市场物品动态生成 -->
@@ -1774,24 +1887,23 @@
     // ==================== 制作系统 ====================
     function updateInventory() {
       const invItems = document.getElementById('inventory-items');
-      
+
       const hasItems = Object.keys(state.inventory).length > 0;
       if (!hasItems) {
-        invItems.innerHTML = '<div style="color: #999; font-size: 0.75rem;">暂无原料，去打水或去市场购买</div>';
+        invItems.innerHTML = '<div style="color: #999; font-size: 0.7rem;">去打水或购买</div>';
         return;
       }
-      
+
       invItems.innerHTML = '';
       for (const [item, count] of Object.entries(state.inventory)) {
         if (count <= 0) continue;
-        
+
         const itemEl = document.createElement('div');
-        itemEl.className = 'inv-item' + (state.selectedIngredient === item ? ' selected' : '');
+        itemEl.className = 'inv-item';
         itemEl.innerHTML = `
           <span>${ITEM_DATA[item].emoji}</span>
           <span class="count">${count}</span>
         `;
-        itemEl.onclick = () => selectIngredient(item);
         itemEl.title = ITEM_DATA[item].name;
         invItems.appendChild(itemEl);
       }
